@@ -2,36 +2,12 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { createLobby, getLobbyById } from '../features/lobby/controllers';
-	import { userData } from '../features/user/store';
-	import { getRandomColor, getRandomEmoji, getRandomName } from '../features/user/controllers';
+	import { userData, getUserForeground, getUserBackground } from '../features/user/store';
+	import { getRandomColor, getRandomEmoji, getRandomName, presetColors } from '../features/user/controllers';
 	import { themeState } from '$lib/theme.svelte';
 	import ThemeToggle from '../components/ThemeToggle.svelte';
 	import { User, Gamepad, Pencil, ArrowRight, Loader2, Dices } from '@lucide/svelte';
 	import { faker } from '@faker-js/faker';
-
-	// Preset Colors (20 soothing and playful options matching the website's contrast and vibe)
-	const presetColors = [
-		{ background: 'hsl(43, 90%, 48%)', foreground: 'hsl(43, 95%, 72%)' }, // Warm Yellow
-		{ background: 'hsl(343, 85%, 52%)', foreground: 'hsl(343, 95%, 78%)' }, // Rose Pink
-		{ background: 'hsl(166, 65%, 40%)', foreground: 'hsl(166, 80%, 75%)' }, // Mint
-		{ background: 'hsl(255, 70%, 55%)', foreground: 'hsl(255, 85%, 80%)' }, // Purple/Lavender
-		{ background: 'hsl(15, 80%, 52%)', foreground: 'hsl(15, 95%, 78%)' }, // Peach/Coral
-		{ background: 'hsl(200, 80%, 45%)', foreground: 'hsl(200, 95%, 75%)' }, // Sky Blue
-		{ background: 'hsl(100, 45%, 42%)', foreground: 'hsl(100, 60%, 75%)' }, // Sage Green
-		{ background: 'hsl(142, 65%, 40%)', foreground: 'hsl(142, 80%, 75%)' }, // Soft Emerald
-		{ background: 'hsl(180, 70%, 38%)', foreground: 'hsl(180, 85%, 72%)' }, // Teal
-		{ background: 'hsl(275, 55%, 52%)', foreground: 'hsl(275, 75%, 80%)' }, // Lilac
-		{ background: 'hsl(328, 70%, 50%)', foreground: 'hsl(328, 90%, 76%)' }, // Raspberry
-		{ background: 'hsl(230, 65%, 48%)', foreground: 'hsl(230, 85%, 75%)' }, // Deep Indigo
-		{ background: 'hsl(35, 85%, 45%)', foreground: 'hsl(35, 95%, 70%)' }, // Amber
-		{ background: 'hsl(120, 50%, 35%)', foreground: 'hsl(120, 65%, 70%)' }, // Forest Green
-		{ background: 'hsl(300, 55%, 45%)', foreground: 'hsl(300, 75%, 75%)' }, // Orchid Plum
-		{ background: 'hsl(48, 85%, 45%)', foreground: 'hsl(48, 95%, 72%)' }, // Butter Yellow
-		{ background: 'hsl(215, 60%, 46%)', foreground: 'hsl(215, 80%, 76%)' }, // Slate Blue
-		{ background: 'hsl(188, 80%, 38%)', foreground: 'hsl(188, 95%, 72%)' }, // Electric Cyan
-		{ background: 'hsl(25, 75%, 46%)', foreground: 'hsl(25, 90%, 74%)' }, // Terracotta
-		{ background: 'hsl(290, 60%, 50%)', foreground: 'hsl(290, 80%, 78%)' } // Fuchsia
-	];
 
 	// Profile Name Draft & Commit
 	let draft = $state($userData.name);
@@ -204,7 +180,7 @@
 						type="button"
 						onclick={openEmojiModal}
 						class="relative flex h-full w-full cursor-pointer items-center justify-center overflow-hidden rounded-full border-4 border-card shadow-[0_8px_24px_rgba(0,0,0,0.06)] transition-all duration-300 hover:scale-105"
-						style="background-color: {$userData.color.background};"
+						style="background-color: {getUserBackground($userData.color)};"
 						aria-label="Choose Avatar Emoji"
 					>
 						<div
@@ -240,7 +216,8 @@
 						onblur={commitName}
 						onkeydown={(e) => e.key === 'Enter' && commitName()}
 						maxlength="18"
-						class="h-12 w-full rounded-md border border-hairline bg-card px-4 text-center font-sans text-[16px] font-[600] text-ink transition-colors focus:border-primary focus:outline-none sm:text-left"
+						class="h-12 w-full rounded-md border border-hairline bg-card px-4 text-center font-sans text-[16px] font-[600] transition-colors focus:border-primary focus:outline-none sm:text-left"
+						style="color: {getUserForeground($userData.color)};"
 						placeholder="Enter name"
 					/>
 				</div>
@@ -252,14 +229,16 @@
 					>
 						Pick Color
 					</label>
-					<div class="scrollbar-none flex w-full gap-2.5 overflow-x-auto pb-1 select-none">
-						{#each presetColors as color (color.background)}
+					<div class="scrollbar-none flex w-full gap-2.5 overflow-x-auto p-1 pb-2 select-none">
+						{#each presetColors as color (color.backgroundLight)}
 							<button
 								type="button"
 								onclick={() => ($userData.color = color)}
 								class="h-8 w-8 shrink-0 cursor-pointer rounded border border-white/20 transition-all duration-200 hover:scale-105 active:scale-95
-									{$userData.color.background === color.background ? 'ring-2 ring-primary ring-offset-2' : ''}"
-								style="background-color: {color.background}; --tw-ring-offset-color: var(--card);"
+									{$userData.color.backgroundLight === color.backgroundLight
+									? 'ring-2 ring-primary ring-offset-2'
+									: ''}"
+								style="background-color: {color.pickerColor}; --tw-ring-offset-color: var(--card);"
 								aria-label="Select color"
 							></button>
 						{/each}

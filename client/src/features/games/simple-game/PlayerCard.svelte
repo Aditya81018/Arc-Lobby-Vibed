@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { userData, type UserData } from '../../user/store';
+	import { userData, getUserForeground, type UserData } from '../../user/store';
 	import type { SimpleGamePlayer, SimpleGameSession } from './types';
 	import UserAvatar from '../../../components/UserAvatar.svelte';
 	import { Heart, X } from '@lucide/svelte';
@@ -49,8 +49,7 @@
 	{#if isPlayerTurn && timeLeft !== 0}
 		<div
 			class="radial-progress"
-			style="--value:{timeLeft * 10}; color: {player?.color
-				.foreground}; --size: 48px; --thickness: 4px"
+			style="--value:{timeLeft * 10}; color: {getUserForeground(player?.color)}; --size: 48px; --thickness: 4px"
 		>
 			<UserAvatar user={player} />
 		</div>
@@ -59,7 +58,7 @@
 			<UserAvatar user={player} />
 		</div>
 	{/if}
-	<div class="text-sm" style="color: {player?.color.foreground || 'gray'};">
+	<div class="text-sm" style="color: {getUserForeground(player?.color)};">
 		{player?.name ?? (session.state === 'waiting' ? 'Waiting...' : 'Unknown')}
 		{#if $userData.id === player?.id}
 			<span class="text-xs font-bold">(You)</span>

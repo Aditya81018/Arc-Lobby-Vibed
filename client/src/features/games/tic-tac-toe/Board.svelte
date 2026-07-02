@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { socket } from '$lib/socket';
-	import { userData, type UserData } from '../../user/store';
+	import { userData, getUserForeground, type UserData } from '../../user/store';
 	import Token from './Token.svelte';
 	import type { TicTacToePlayer, TicTacToeSession } from './types';
 	import WinningStroke from './WinningStroke.svelte';
@@ -42,7 +42,7 @@
 					class="h-28 w-28 border-base-300 font-mono {i !== 0 ? 'border-t-4' : ''} {j !== 0
 						? 'border-l-4'
 						: ''}"
-					style="color: {player?.color.foreground};"
+					style="color: {getUserForeground(player?.color)};"
 				>
 					{#if playerData?.token !== undefined}
 						<Token token={playerData.token} />

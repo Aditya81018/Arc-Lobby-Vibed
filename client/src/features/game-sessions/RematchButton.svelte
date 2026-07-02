@@ -7,7 +7,7 @@
 	import { joinGameSession, rematchGameSession } from './controller';
 	import { gameSessionsStore, type GameSession } from './store';
 	import { getMemberFromId } from '../lobby/controllers';
-	import { userData } from '../user/store';
+	import { userData, getUserForeground } from '../user/store';
 	import UserAvatar from '../../components/UserAvatar.svelte';
 
 	const {
@@ -107,7 +107,7 @@
 			<div class="text-2xl font-bold">Incoming Rematch Request</div>
 			<div class="flex items-center gap-2">
 				<UserAvatar user={fromPlayer!} />
-				<span class="font-bold" style="color: {fromPlayer?.color.foreground ?? 'gray'}">
+				<span class="font-bold" style="color: {getUserForeground(fromPlayer?.color)}">
 					{fromPlayer?.name ?? 'Unknown'}
 				</span>
 			</div>

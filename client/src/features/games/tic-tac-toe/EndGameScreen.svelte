@@ -2,7 +2,7 @@
 	import UserAvatar from '../../../components/UserAvatar.svelte';
 	import BackToLobbyButton from '../../game-sessions/BackToLobbyButton.svelte';
 	import RematchButton from '../../game-sessions/RematchButton.svelte';
-	import type { UserData } from '../../user/store';
+	import { getUserForeground, type UserData } from '../../user/store';
 	import type { TicTacToeSession } from './types';
 
 	const {
@@ -39,7 +39,7 @@
 				<span class="opacity-50">Match Draw!</span>
 			{:else if winner !== undefined}
 				<UserAvatar user={winner} />
-				<span style="color: {winner.color.foreground ?? 'gray'};">{winner.name ?? 'Unknown'}</span> Won!
+				<span style="color: {getUserForeground(winner.color)};">{winner.name ?? 'Unknown'}</span> Won!
 			{:else}
 				<span class="opacity-50">Game Ended...</span>
 			{/if}

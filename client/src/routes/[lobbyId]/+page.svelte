@@ -12,7 +12,7 @@
 	import JoinGameSessionButton from '../../features/game-sessions/JoinGameSessionButton.svelte';
 	import SpectateGameSessionButton from '../../features/game-sessions/SpectateGameSessionButton.svelte';
 	import { gameSessionsStore } from '../../features/game-sessions/store';
-	import { userData } from '../../features/user/store';
+	import { userData, getUserForeground, getUserBackground } from '../../features/user/store';
 	import UserAvatar from '../../components/UserAvatar.svelte';
 	import { gamesStore } from '../../features/games/store';
 	import { onMount } from 'svelte';
@@ -91,7 +91,7 @@
 				<div class="flex items-center justify-center gap-2">
 					<UserAvatar user={$userData} />
 					<!-- <span>{$userData.emoji}</span> -->
-					<span style="color: {$userData.color.foreground}">{$userData.name}</span>
+					<span style="color: {getUserForeground($userData.color)}">{$userData.name}</span>
 				</div>
 				<div class="flex items-center gap-2">
 					<div class="flex flex-col justify-center">
@@ -114,12 +114,12 @@
 				<div class="chat {isMe ? 'chat-end' : 'chat-start'}">
 					<div
 						class="chat-header mb-1 text-xs opacity-50"
-						style="color: {memberData?.color.foreground};"
+						style="color: {getUserForeground(memberData?.color)};"
 					>
 						{memberData?.name || 'Unknown'}
 					</div>
 					{#if msg.type === 'text'}
-						<div class="chat-bubble" style="background-color: {memberData?.color.background};">
+						<div class="chat-bubble" style="background-color: {getUserBackground(memberData?.color)};">
 							{msg.content}
 						</div>
 					{:else if msg.type === 'game-session-invite'}
@@ -183,7 +183,7 @@
 											{:else}
 												<UserAvatar user={winner} />
 												<div class="font-medium">
-													<span style="color: {winner.color.foreground};">
+													<span style="color: {getUserForeground(winner.color)};">
 														{winner.name}
 													</span>
 													Won!
@@ -251,7 +251,7 @@
 			<ul class="flex h-full w-full flex-col p-2">
 				{#each $membersStore as member, i (i)}
 					<li>
-						<div class="flex items-center gap-2 px-4 py-2" style="color: {member.color.foreground}">
+						<div class="flex items-center gap-2 px-4 py-2" style="color: {getUserForeground(member.color)}">
 							<UserAvatar user={member} />
 							<!-- <span>{member.emoji}</span> -->
 							<span class="flex-1 truncate">{member.name}</span>

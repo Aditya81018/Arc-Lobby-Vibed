@@ -1,7 +1,7 @@
 <script lang="ts">
 	import UserAvatar from '../../components/UserAvatar.svelte';
 	import { getRandomColor, getRandomEmoji } from './controllers';
-	import { userData } from './store';
+	import { userData, getUserForeground } from './store';
 
 	let draft = $userData.name;
 
@@ -30,6 +30,6 @@
 	bind:value={draft}
 	onchange={commit}
 	class="input text-center font-mono"
-	style="color: {$userData.color.foreground}"
+	style="color: {getUserForeground($userData.color)}"
 	placeholder="Username"
 />
