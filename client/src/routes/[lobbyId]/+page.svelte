@@ -16,6 +16,7 @@
 	import UserAvatar from '../../components/UserAvatar.svelte';
 	import { gamesStore } from '../../features/games/store';
 	import { onMount } from 'svelte';
+	import ThemeToggle from '../../components/ThemeToggle.svelte';
 
 	const lobbyId = page.params.lobbyId!;
 	let message = $state('');
@@ -92,9 +93,12 @@
 					<!-- <span>{$userData.emoji}</span> -->
 					<span style="color: {$userData.color.foreground}">{$userData.name}</span>
 				</div>
-				<div class="flex flex-col justify-center">
-					<span class="text-right text-xs leading-none font-bold uppercase opacity-50">Lobby</span>
-					<span class="font-mono font-bold text-primary">#{lobbyId}</span>
+				<div class="flex items-center gap-2">
+					<div class="flex flex-col justify-center">
+						<span class="text-right text-xs leading-none font-bold uppercase opacity-50">Lobby</span>
+						<span class="font-mono font-bold text-primary">#{lobbyId}</span>
+					</div>
+					<ThemeToggle />
 				</div>
 			</div>
 		</header>

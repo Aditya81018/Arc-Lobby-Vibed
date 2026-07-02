@@ -1,5 +1,138 @@
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400..800&family=Fredoka:wght@300..700&family=Inter:wght@100..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+
 @import 'tailwindcss';
 
-@plugin 'daisyui' {
+@plugin "daisyui" {
+  themes: arc-light --default, arc-dark --prefersdark;
   logs: false;
+}
+
+@plugin "daisyui/theme" {
+  name: "arc-light";
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+  --color-primary: #7C5CFC;
+  --color-primary-content: #FFFFFF;
+  --color-base-100: #FAF6EC;
+  --color-base-200: #FFFFFF;
+  --color-base-300: #ECE6D8;
+  --color-base-content: #171321;
+  --color-secondary: #F6C445;
+  --color-secondary-content: #20180A;
+  --color-accent: #FF5D8F;
+  --color-accent-content: #FFFFFF;
+  --color-neutral: #6B6B76;
+  --color-neutral-content: #FFFFFF;
+  --color-info: #3FBFA3;
+  --color-info-content: #FFFFFF;
+  --color-success: #3FBF6B;
+  --color-success-content: #FFFFFF;
+  --color-warning: #F6C445;
+  --color-warning-content: #20180A;
+  --color-error: #FF5D8F;
+  --color-error-content: #FFFFFF;
+  --radius-selector: 9999px;
+  --radius-field: 14px;
+  --radius-box: 20px;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+  --canvas: #FAF6EC;
+  --card: #FFFFFF;
+  --hairline: #ECE6D8;
+  --ink: #171321;
+  --body: #6B6B76;
+  --muted: #9A96A6;
+  --host-panel: #FCF3D6;
+  --host-border: #F0D67E;
+  --join-panel: #EFE9FB;
+  --join-border: #D9CBF7;
+}
+
+@plugin "daisyui/theme" {
+  name: "arc-dark";
+  default: false;
+  prefersdark: true;
+  color-scheme: dark;
+  --color-primary: #8B70FF;
+  --color-primary-content: #FFFFFF;
+  --color-base-100: #0A0D18;
+  --color-base-200: #12162A;
+  --color-base-300: #232840;
+  --color-base-content: #FFFFFF;
+  --color-secondary: #F6C445;
+  --color-secondary-content: #20180A;
+  --color-accent: #FF5D8F;
+  --color-accent-content: #FFFFFF;
+  --color-neutral: #A8AEC4;
+  --color-neutral-content: #0A0D18;
+  --color-info: #3FBFA3;
+  --color-info-content: #FFFFFF;
+  --color-success: #3FBF6B;
+  --color-success-content: #FFFFFF;
+  --color-warning: #F6C445;
+  --color-warning-content: #20180A;
+  --color-error: #FF5D8F;
+  --color-error-content: #FFFFFF;
+  --radius-selector: 9999px;
+  --radius-field: 14px;
+  --radius-box: 20px;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+  --canvas: #0A0D18;
+  --card: #12162A;
+  --hairline: #232840;
+  --ink: #FFFFFF;
+  --body: #A8AEC4;
+  --muted: #6E7387;
+  --host-panel: #1B1A12;
+  --host-border: #4A4222;
+  --join-panel: #181A30;
+  --join-border: #332C5C;
+}
+
+@theme {
+  --color-canvas: var(--canvas);
+  --color-card: var(--card);
+  --color-hairline: var(--hairline);
+  --color-ink: var(--ink);
+  --color-body: var(--body);
+  --color-muted: var(--muted);
+  --color-host-panel: var(--host-panel);
+  --color-host-border: var(--host-border);
+  --color-join-panel: var(--join-panel);
+  --color-join-border: var(--join-border);
+  
+  --color-accent-yellow: #F6C445;
+  --color-accent-pink: #FF5D8F;
+  --color-accent-green: #57D08C;
+  --color-accent-orange: #FF8A3D;
+  --color-accent-mint: #3FBFA3;
+  --color-step-purple: #7C5CFC;
+  --color-step-yellow: #F6C445;
+  --color-step-pink: #FF5D8F;
+  
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-full: 9999px;
+  
+  --font-display: "Baloo 2", "Fredoka", sans-serif;
+  --font-sans: "Plus Jakarta Sans", "Inter", sans-serif;
+  
+  --spacing-xxs: 4px;
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+  --spacing-section: 64px;
 }
