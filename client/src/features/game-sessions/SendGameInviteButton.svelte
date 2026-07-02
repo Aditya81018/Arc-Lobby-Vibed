@@ -70,7 +70,7 @@
 	{#if isLoading}
 		<LoadingScreen />
 	{/if}
-	<div class="modal-box flex max-h-[85vh] max-w-xl flex-col overflow-hidden p-0">
+	<div class="modal-box flex flex-col overflow-hidden p-0">
 		<div class="flex items-center justify-between bg-base-100 px-6 py-4">
 			<div class="flex items-center gap-3">
 				{#if selectedGame}

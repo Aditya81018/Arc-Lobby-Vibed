@@ -7,6 +7,31 @@
 	import { themeState } from '$lib/theme.svelte';
 	import ThemeToggle from '../components/ThemeToggle.svelte';
 	import { User, Gamepad, Pencil, ArrowRight, Loader2, Dices } from '@lucide/svelte';
+	import { faker } from '@faker-js/faker';
+
+	// Preset Colors (20 soothing and playful options matching the website's contrast and vibe)
+	const presetColors = [
+		{ background: 'hsl(43, 90%, 48%)', foreground: 'hsl(43, 95%, 72%)' },   // Warm Yellow
+		{ background: 'hsl(343, 85%, 52%)', foreground: 'hsl(343, 95%, 78%)' }, // Rose Pink
+		{ background: 'hsl(166, 65%, 40%)', foreground: 'hsl(166, 80%, 75%)' }, // Mint
+		{ background: 'hsl(255, 70%, 55%)', foreground: 'hsl(255, 85%, 80%)' }, // Purple/Lavender
+		{ background: 'hsl(15, 80%, 52%)', foreground: 'hsl(15, 95%, 78%)' },   // Peach/Coral
+		{ background: 'hsl(200, 80%, 45%)', foreground: 'hsl(200, 95%, 75%)' }, // Sky Blue
+		{ background: 'hsl(100, 45%, 42%)', foreground: 'hsl(100, 60%, 75%)' }, // Sage Green
+		{ background: 'hsl(142, 65%, 40%)', foreground: 'hsl(142, 80%, 75%)' }, // Soft Emerald
+		{ background: 'hsl(180, 70%, 38%)', foreground: 'hsl(180, 85%, 72%)' }, // Teal
+		{ background: 'hsl(275, 55%, 52%)', foreground: 'hsl(275, 75%, 80%)' }, // Lilac
+		{ background: 'hsl(328, 70%, 50%)', foreground: 'hsl(328, 90%, 76%)' }, // Raspberry
+		{ background: 'hsl(230, 65%, 48%)', foreground: 'hsl(230, 85%, 75%)' }, // Deep Indigo
+		{ background: 'hsl(35, 85%, 45%)', foreground: 'hsl(35, 95%, 70%)' },   // Amber
+		{ background: 'hsl(120, 50%, 35%)', foreground: 'hsl(120, 65%, 70%)' }, // Forest Green
+		{ background: 'hsl(300, 55%, 45%)', foreground: 'hsl(300, 75%, 75%)' }, // Orchid Plum
+		{ background: 'hsl(48, 85%, 45%)', foreground: 'hsl(48, 95%, 72%)' },   // Butter Yellow
+		{ background: 'hsl(215, 60%, 46%)', foreground: 'hsl(215, 80%, 76%)' }, // Slate Blue
+		{ background: 'hsl(188, 80%, 38%)', foreground: 'hsl(188, 95%, 72%)' }, // Electric Cyan
+		{ background: 'hsl(25, 75%, 46%)', foreground: 'hsl(25, 90%, 74%)' },   // Terracotta
+		{ background: 'hsl(290, 60%, 50%)', foreground: 'hsl(290, 80%, 78%)' }  // Fuchsia
+	];
 
 	// Profile Name Draft & Commit
 	let draft = $state($userData.name);
@@ -31,11 +56,48 @@
 	}
 
 	function randomizeAvatar() {
+		const randomIndex = Math.floor(Math.random() * presetColors.length);
 		$userData = {
 			...$userData,
 			emoji: getRandomEmoji(),
-			color: getRandomColor()
+			color: presetColors[randomIndex]
 		};
+	}
+
+
+
+	function randomizeAll() {
+		randomizeName();
+		randomizeAvatar();
+	}
+
+	// Emoji modal selection
+	let emojiModalRef: HTMLDialogElement;
+	let selectedCategory = $state('😀 Smileys');
+
+	const emojiCategories: Record<string, string[]> = {
+		'😀 Smileys': (faker.definitions.internet?.emoji as any)?.smiley || [],
+		'🐸 Nature': (faker.definitions.internet?.emoji as any)?.nature || [],
+		'🍔 Food': (faker.definitions.internet?.emoji as any)?.food || [],
+		'🏆 Activity': (faker.definitions.internet?.emoji as any)?.activity || [],
+		'🚗 Travel': (faker.definitions.internet?.emoji as any)?.travel || [],
+		'💡 Objects': (faker.definitions.internet?.emoji as any)?.object || [],
+		'❤️ Symbols': (faker.definitions.internet?.emoji as any)?.symbol || [],
+		'🚩 Flags': (faker.definitions.internet?.emoji as any)?.flag || [],
+		'🙋 People': (faker.definitions.internet?.emoji as any)?.person || []
+	};
+
+	function openEmojiModal() {
+		emojiModalRef.showModal();
+	}
+
+	function closeEmojiModal() {
+		emojiModalRef.close();
+	}
+
+	function selectEmoji(emoji: string) {
+		$userData.emoji = emoji;
+		closeEmojiModal();
 	}
 
 	// Lobby Creation
@@ -118,37 +180,50 @@
 			class="col-span-1 flex min-h-[460px] flex-col items-start rounded-xl border border-hairline bg-card p-8 shadow-[0_8px_30px_rgb(0,0,0,0.02)] md:col-span-5"
 		>
 			<!-- Header -->
-			<div class="flex w-full items-center gap-3">
-				<div class="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-white">
-					<User size={20} />
+			<div class="flex w-full items-center justify-between gap-3">
+				<div class="flex items-center gap-3">
+					<div class="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-white">
+						<User size={20} />
+					</div>
+					<h2 class="font-sans text-xl leading-none font-[800] text-ink">Customize Profile</h2>
 				</div>
-				<h2 class="font-sans text-xl leading-none font-[800] text-ink">Customize Profile</h2>
+				<button
+					type="button"
+					onclick={randomizeAll}
+					class="btn btn-circle btn-ghost btn-sm text-primary transition-all active:scale-95"
+					title="Randomize All Profile Details"
+				>
+					<Dices size={20} />
+				</button>
 			</div>
 
 			<!-- Avatar Circle editor -->
 			<div class="relative my-6 flex w-full flex-grow flex-col items-center justify-center">
-				<button
-					onclick={randomizeAvatar}
-					class="group relative flex h-40 w-40 items-center justify-center overflow-hidden rounded-full border-4 border-card shadow-[0_8px_24px_rgba(0,0,0,0.06)] transition-all duration-300 hover:scale-105"
-					style="background-color: {$userData.color.background};"
-					aria-label="Randomize Avatar"
-				>
-					<div
-						class="pointer-events-none absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-					></div>
-					<span
-						class="filter text-7xl drop-shadow-sm transition-transform duration-300 select-none group-hover:scale-110"
+				<div class="group relative h-40 w-40">
+					<button
+						type="button"
+						onclick={openEmojiModal}
+						class="relative flex h-full w-full cursor-pointer items-center justify-center overflow-hidden rounded-full border-4 border-card shadow-[0_8px_24px_rgba(0,0,0,0.06)] transition-all duration-300 hover:scale-105"
+						style="background-color: {$userData.color.background};"
+						aria-label="Choose Avatar Emoji"
 					>
-						{$userData.emoji}
-					</span>
+						<div
+							class="pointer-events-none absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+						></div>
+						<span
+							class="filter text-7xl drop-shadow-sm transition-transform duration-300 select-none group-hover:scale-110"
+						>
+							{$userData.emoji}
+						</span>
+					</button>
 
 					<!-- Edit indicator -->
 					<div
-						class="absolute right-1 bottom-1 flex h-9 w-9 items-center justify-center rounded-full border-2 border-card bg-primary text-white shadow-md transition-transform duration-300 group-hover:rotate-12"
+						class="pointer-events-none absolute right-1 bottom-1 flex h-9 w-9 items-center justify-center rounded-full border-2 border-card bg-primary text-white shadow-md transition-transform duration-300 group-hover:scale-105 group-hover:rotate-12"
 					>
 						<Pencil size={15} />
 					</div>
-				</button>
+				</div>
 			</div>
 
 			<!-- Username field -->
@@ -165,17 +240,30 @@
 						onblur={commitName}
 						onkeydown={(e) => e.key === 'Enter' && commitName()}
 						maxlength="18"
-						class="h-12 w-full rounded-md border border-hairline bg-card px-4 pr-12 text-center font-sans text-[16px] font-[600] text-ink transition-colors focus:border-primary focus:outline-none sm:text-left"
+						class="h-12 w-full rounded-md border border-hairline bg-card px-4 text-center font-sans text-[16px] font-[600] text-ink transition-colors focus:border-primary focus:outline-none sm:text-left"
 						placeholder="Enter name"
 					/>
-					<button
-						type="button"
-						onclick={randomizeName}
-						class="hover:text-opacity-80 absolute top-1/2 right-3 flex -translate-y-1/2 cursor-pointer items-center justify-center rounded-md p-1.5 text-primary transition-all hover:bg-black/5 dark:hover:bg-white/5"
-						title="Randomize Name"
+				</div>
+
+				<!-- Pick Color Section -->
+				<div class="mt-5 w-full">
+					<label
+						class="mb-2 block font-sans text-[13px] font-[700] tracking-[0.3px] text-body uppercase"
 					>
-						<Dices size={18} />
-					</button>
+						Pick Color
+					</label>
+					<div class="scrollbar-none flex w-full gap-2.5 overflow-x-auto pb-1 select-none">
+						{#each presetColors as color (color.background)}
+							<button
+								type="button"
+								onclick={() => $userData.color = color}
+								class="h-8 w-8 shrink-0 cursor-pointer rounded border border-white/20 transition-all duration-200 hover:scale-105 active:scale-95
+									{$userData.color.background === color.background ? 'ring-2 ring-primary ring-offset-2' : ''}"
+								style="background-color: {color.background}; --tw-ring-offset-color: var(--card);"
+								aria-label="Select color"
+							></button>
+						{/each}
+					</div>
 				</div>
 			</div>
 		</section>
@@ -284,4 +372,65 @@
 			</div>
 		</section>
 	</div>
+
+	<!-- Emoji Picker Modal -->
+	<dialog bind:this={emojiModalRef} class="modal modal-bottom sm:modal-middle">
+		<div class="modal-box flex max-h-[500px] flex-col overflow-hidden p-0 border border-hairline bg-card shadow-[0_20px_50px_rgba(0,0,0,0.3)]">
+			<!-- Header -->
+			<div class="flex items-center justify-between border-b border-hairline p-4">
+				<h3 class="font-sans text-lg font-[800] text-ink">Choose your Emoji</h3>
+				<button
+					onclick={closeEmojiModal}
+					class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full font-sans text-xl text-muted transition-colors hover:bg-black/5 dark:hover:bg-white/5"
+				>
+					✕
+				</button>
+			</div>
+
+			<!-- Categories Tab Row -->
+			<div
+				class="scrollbar-none flex gap-1 overflow-x-auto border-b border-hairline bg-canvas/30 p-2 select-none"
+			>
+				{#each Object.keys(emojiCategories) as categoryName (categoryName)}
+					<button
+						onclick={() => (selectedCategory = categoryName)}
+						class="cursor-pointer rounded-full px-3 py-1.5 font-sans text-[13px] font-[600] whitespace-nowrap transition-colors
+						{selectedCategory === categoryName
+							? 'bg-primary text-white'
+							: 'text-body hover:bg-black/5 dark:hover:bg-white/5'}"
+					>
+						{categoryName}
+					</button>
+				{/each}
+			</div>
+
+			<!-- Emoji Grid Body -->
+			<div
+				class="custom-scrollbar grid max-h-[300px] flex-grow grid-cols-6 gap-2 overflow-y-auto p-4 sm:grid-cols-8"
+			>
+				{#each emojiCategories[selectedCategory] as emoji (emoji)}
+					<button
+						onclick={() => selectEmoji(emoji)}
+						class="flex cursor-pointer items-center justify-center rounded-lg p-2 text-3xl transition-all select-none hover:scale-110 hover:bg-primary/10 active:scale-95"
+					>
+						{emoji}
+					</button>
+				{/each}
+			</div>
+		</div>
+
+		<form method="dialog" class="modal-backdrop bg-black/40 backdrop-blur-[2px]">
+			<button>close</button>
+		</form>
+	</dialog>
 </div>
+
+<style>
+	.custom-scrollbar::-webkit-scrollbar {
+		width: 4px;
+	}
+	.custom-scrollbar::-webkit-scrollbar-thumb {
+		background: rgba(0, 0, 0, 0.1);
+		border-radius: 10px;
+	}
+</style>
