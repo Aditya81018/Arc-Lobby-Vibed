@@ -62,36 +62,45 @@
 	};
 </script>
 
-<button class="btn btn-square shadow-lg btn-primary" type="button" onclick={openModal}>
-	<Gamepad size={24} />
+<button
+	class="btn btn-square h-12 w-12 rounded-md shadow-sm border border-hairline bg-card text-ink hover:bg-base-300 btn-ghost cursor-pointer transition-all active:scale-95"
+	type="button"
+	onclick={openModal}
+	title="Send Game Invite"
+>
+	<Gamepad size={20} />
 </button>
 
 <dialog bind:this={modalRef} class="modal modal-bottom sm:modal-middle">
 	{#if isLoading}
 		<LoadingScreen />
 	{/if}
-	<div class="modal-box flex flex-col overflow-hidden p-0">
-		<div class="flex items-center justify-between bg-base-100 px-6 py-4">
+	<div class="modal-box flex flex-col overflow-hidden border border-hairline bg-card p-0 shadow-[0_20px_50px_rgba(0,0,0,0.3)]">
+		<div class="flex items-center justify-between border-b border-hairline bg-canvas/30 px-6 py-4">
 			<div class="flex items-center gap-3">
 				{#if selectedGame}
 					<button class="btn btn-circle btn-ghost btn-xs" onclick={() => (selectedGame = null)}>
 						<ChevronLeft size={20} />
 					</button>
 				{/if}
-				<h3 class="text-xl font-bold">{selectedGame ? selectedGame.name : 'Select Game'}</h3>
+				<h3 class="font-sans text-lg font-[800] text-ink">{selectedGame ? selectedGame.name : 'Select Game'}</h3>
 			</div>
-			<button class="btn btn-circle btn-ghost btn-sm" onclick={closeModal}>
+			<button
+				class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-muted transition-colors hover:bg-black/5 dark:hover:bg-white/5"
+				onclick={closeModal}
+				aria-label="Close modal"
+			>
 				<X size={20} />
 			</button>
 		</div>
 
-		<div class="custom-scrollbar overflow-y-auto px-6 pb-6">
+		<div class="custom-scrollbar overflow-y-auto px-6 pb-6 pt-4">
 			{#if !selectedGame}
 				<div class="grid grid-cols-2 gap-4 md:grid-cols-3">
 					{#each Object.values($gamesStore) as game, i (i)}
 						<button
 							onclick={() => handleGameSelect(game)}
-							class="group relative aspect-4/3 overflow-hidden rounded-2xl bg-base-300 transition-transform active:scale-95"
+							class="group relative aspect-[4/3] overflow-hidden rounded-xl border border-hairline bg-base-300 transition-all duration-300 hover:scale-[1.02] active:scale-95 cursor-pointer"
 						>
 							<img
 								src={game.image}
@@ -105,11 +114,11 @@
 					{/each}
 				</div>
 			{:else}
-				<div class="divide-y divide-base-200">
+				<div class="divide-y divide-hairline">
 					{#each Object.values(selectedGame.settings || {}) as setting, i (i)}
 						<div class="flex items-center gap-4 py-5 first:pt-0">
 							<!-- svelte-ignore a11y_label_has_associated_control -->
-							<label class="block text-sm font-bold tracking-wider uppercase opacity-60">
+							<label class="block font-sans text-xs font-[700] tracking-[0.3px] text-body uppercase select-none">
 								{setting.name}:
 							</label>
 
@@ -123,11 +132,11 @@
 								<div class="flex flex-wrap gap-2">
 									{#each setting.options as option, i (i)}
 										<button
-											class="no-animation btn rounded-lg font-medium btn-sm {settingsValues[
+											class="no-animation btn rounded-md font-sans text-xs font-semibold btn-sm transition-all duration-200 cursor-pointer {settingsValues[
 												setting.id
 											] === option.value
-												? 'btn-primary'
-												: 'border-none bg-base-200 btn-ghost hover:bg-base-300'}"
+												? 'bg-primary text-white border-none shadow-sm'
+												: 'border border-hairline bg-canvas hover:bg-base-300 text-ink'}"
 											onclick={() => (settingsValues[setting.id] = option.value)}
 										>
 											{option.name}
@@ -138,11 +147,11 @@
 								<div class="flex flex-wrap gap-2">
 									{#each setting.options as option, i (i)}
 										<button
-											class="no-animation btn rounded-lg font-medium btn-sm {settingsValues[
+											class="no-animation btn rounded-md font-sans text-xs font-semibold btn-sm transition-all duration-200 cursor-pointer {settingsValues[
 												setting.id
 											].includes(option.value)
-												? 'btn-primary'
-												: 'border-none bg-base-200 btn-ghost hover:bg-base-300'}"
+												? 'bg-primary text-white border-none shadow-sm'
+												: 'border border-hairline bg-canvas hover:bg-base-300 text-ink'}"
 											onclick={() => toggleMultiSelect(setting.id, option.value)}
 										>
 											{option.name}
@@ -157,9 +166,9 @@
 		</div>
 
 		{#if selectedGame}
-			<div class="bg-base-100 p-6 pt-2">
+			<div class="bg-card p-6 pt-2 border-t border-hairline">
 				<button
-					class="btn h-12 btn-block shadow-md btn-primary"
+					class="btn h-12 btn-block rounded-md font-sans font-bold text-sm border-none shadow-md transition-all active:scale-95 bg-primary text-white hover:bg-primary/95 cursor-pointer"
 					disabled={isLoading}
 					onclick={handleSendGameInvite}
 				>
@@ -180,7 +189,10 @@
 		width: 4px;
 	}
 	.custom-scrollbar::-webkit-scrollbar-thumb {
-		background: rgba(0, 0, 0, 0.1);
+		background: rgba(124, 92, 252, 0.15);
 		border-radius: 10px;
+	}
+	.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+		background: rgba(124, 92, 252, 0.3);
 	}
 </style>

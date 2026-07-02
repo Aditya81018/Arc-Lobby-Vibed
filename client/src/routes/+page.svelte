@@ -3,7 +3,12 @@
 	import { resolve } from '$app/paths';
 	import { createLobby, getLobbyById } from '../features/lobby/controllers';
 	import { userData, getUserForeground, getUserBackground } from '../features/user/store';
-	import { getRandomColor, getRandomEmoji, getRandomName, presetColors } from '../features/user/controllers';
+	import {
+		getRandomColor,
+		getRandomEmoji,
+		getRandomName,
+		presetColors
+	} from '../features/user/controllers';
 	import { themeState } from '$lib/theme.svelte';
 	import ThemeToggle from '../components/ThemeToggle.svelte';
 	import { User, Gamepad, Pencil, ArrowRight, Loader2, Dices } from '@lucide/svelte';
@@ -320,7 +325,7 @@
 						bind:value={lobbyId}
 						oninput={handleLobbyIdInput}
 						maxlength="6"
-						class="h-12 flex-grow rounded-md border border-hairline bg-card px-4 text-center font-sans text-[16px] font-[600] text-ink placeholder-muted transition-colors focus:border-primary focus:outline-none sm:text-left"
+						class="h-12 flex-grow rounded-md border border-hairline bg-card px-4 text-center font-mono text-[16px] font-[600] text-ink placeholder-muted transition-colors focus:border-primary focus:outline-none sm:text-left"
 					/>
 					<button
 						type="submit"

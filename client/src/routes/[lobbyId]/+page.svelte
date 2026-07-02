@@ -1,7 +1,18 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { socket } from '$lib/socket';
-	import { ArrowDown, Menu, MessageSquareDashed, Send } from '@lucide/svelte';
+	import {
+		ArrowDown,
+		Menu,
+		MessageSquareDashed,
+		Send,
+		Copy,
+		Check,
+		Users,
+		LogOut,
+		Trophy,
+		Gamepad
+	} from '@lucide/svelte';
 	import { getMemberFromId } from '../../features/lobby/controllers';
 	import LeaveLobbyButton from '../../features/lobby/LeaveLobbyButton.svelte';
 	import { membersStore } from '../../features/lobby/store';
@@ -17,12 +28,22 @@
 	import { gamesStore } from '../../features/games/store';
 	import { onMount } from 'svelte';
 	import ThemeToggle from '../../components/ThemeToggle.svelte';
+	import { themeState } from '$lib/theme.svelte';
 
 	const lobbyId = page.params.lobbyId!;
 	let message = $state('');
 
 	let messagesContainer: HTMLElement;
 	let showScrollButton = $state(false);
+
+	let copied = $state(false);
+	function copyLobbyLink() {
+		navigator.clipboard.writeText(window.location.href);
+		copied = true;
+		setTimeout(() => {
+			copied = false;
+		}, 2000);
+	}
 
 	function handleSendTextMessage() {
 		if (message.trim() === '') return;
@@ -81,182 +102,292 @@
 	});
 </script>
 
-<div class="drawer w-screen bg-base-200 lg:drawer-open">
+<div class="drawer h-svh w-screen bg-canvas text-ink transition-colors duration-200 lg:drawer-open">
 	<input id="member-drawer" type="checkbox" class="drawer-toggle" />
 
-	<div class="drawer-content flex h-svh flex-col overflow-hidden">
-		<header class="navbar shrink-0 border-b border-base-300 bg-base-100 px-4">
-			<div class="flex w-full flex-1 justify-between gap-2">
-				<label for="member-drawer" class="btn btn-square btn-ghost lg:hidden"><Menu /></label>
-				<div class="flex items-center justify-center gap-2">
-					<UserAvatar user={$userData} />
-					<!-- <span>{$userData.emoji}</span> -->
-					<span style="color: {getUserForeground($userData.color)}">{$userData.name}</span>
-				</div>
-				<div class="flex items-center gap-2">
-					<div class="flex flex-col justify-center">
-						<span class="text-right text-xs leading-none font-bold uppercase opacity-50">Lobby</span>
-						<span class="font-mono font-bold text-primary">#{lobbyId}</span>
-					</div>
-					<ThemeToggle />
-				</div>
-			</div>
-		</header>
-
-		<main
-			bind:this={messagesContainer}
-			onscroll={handleScroll}
-			class="relative flex-1 space-y-4 overflow-y-auto p-4"
+	<div class="drawer-content flex h-svh flex-col overflow-hidden lg:p-4">
+		<div
+			class="flex h-full w-full flex-col overflow-hidden border-hairline bg-card shadow-[0_8px_30px_rgb(0,0,0,0.02)] lg:rounded-2xl lg:border"
 		>
-			{#each $lobbyMessagesStore as msg, i (i)}
-				{@const isMe = msg.senderId === socket.id}
-				{@const memberData = getMemberFromId(msg.senderId)}
-				<div class="chat {isMe ? 'chat-end' : 'chat-start'}">
-					<div
-						class="chat-header mb-1 text-xs opacity-50"
-						style="color: {getUserForeground(memberData?.color)};"
-					>
-						{memberData?.name || 'Unknown'}
-					</div>
-					{#if msg.type === 'text'}
-						<div class="chat-bubble" style="background-color: {getUserBackground(memberData?.color)};">
-							{msg.content}
+			<header class="navbar shrink-0 border-b border-hairline bg-card px-4 py-3 select-none">
+				<div class="flex w-full flex-1 justify-between gap-2">
+					<label for="member-drawer" class="btn btn-square btn-ghost lg:hidden"><Menu /></label>
+
+					<div class="flex items-center gap-3">
+						<!-- Mini brand logo -->
+						<div class="mr-1 hidden items-center gap-1 sm:flex">
+							<span class="font-display text-xl font-extrabold text-ink">Arc</span>
+							<span class="font-display text-xl font-extrabold text-primary">Lobby</span>
 						</div>
-					{:else if msg.type === 'game-session-invite'}
-						{@const gameSession = $gameSessionsStore[msg.content as string]}
-						{@const game = getLocalGameById(gameSession?.gameId)!}
+					</div>
 
-						{#if gameSession && game}
-							<div class="chat-bubble max-w-sm p-4 shadow-lg">
-								<div class="flex items-start gap-3">
-									<div class="avatar">
-										<div class="h-12 w-12 rounded-lg bg-base-300 ring-1 ring-secondary-content/20">
-											<img src={game.image} alt={game.name} />
+					<div class="flex items-center gap-3">
+						<!-- Room Code Chip -->
+						<div
+							class="flex items-center gap-2 rounded-full border border-hairline bg-canvas/40 px-3 py-1 pr-1"
+						>
+							<span class="text-xs leading-none font-bold tracking-wider text-muted uppercase"
+								>Lobby</span
+							>
+							<button
+								onclick={copyLobbyLink}
+								class="flex cursor-pointer items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 font-mono text-sm font-extrabold text-primary transition-all duration-200 hover:bg-primary/20 active:scale-95"
+								title="Click to copy invite link"
+							>
+								<span>{lobbyId}</span>
+								{#if copied}
+									<Check size={12} class="text-success" />
+								{:else}
+									<Copy size={12} />
+								{/if}
+							</button>
+						</div>
+						<ThemeToggle />
+					</div>
+				</div>
+			</header>
+
+			<main
+				bind:this={messagesContainer}
+				onscroll={handleScroll}
+				class="custom-scrollbar relative flex-1 space-y-4 overflow-y-auto bg-canvas/10 p-4"
+			>
+				{#each $lobbyMessagesStore as msg, i (i)}
+					{@const isMe = msg.senderId === socket.id}
+					{@const memberData = getMemberFromId(msg.senderId)}
+					<div class="chat {isMe ? 'chat-end' : 'chat-start'} gap-1">
+						<div
+							class="chat-header mb-1 text-xs font-bold"
+							style="color: {getUserForeground(memberData?.color)};"
+						>
+							{memberData?.name || 'Unknown'}
+							{#if isMe}
+								<span class="ml-1 text-[9px] font-normal opacity-50">(You)</span>
+							{/if}
+						</div>
+
+						{#if msg.type === 'text'}
+							<div
+								class="chat-bubble border border-black/5 px-4 py-2.5 font-sans text-sm leading-relaxed dark:border-white/5"
+								style="background-color: {getUserBackground(memberData?.color)};"
+							>
+								{msg.content}
+							</div>
+						{:else if msg.type === 'game-session-invite'}
+							{@const gameSession = $gameSessionsStore[msg.content as string]}
+							{@const game = getLocalGameById(gameSession?.gameId)!}
+
+							{#if gameSession && game}
+								<div
+									class="animate-fade-in chat-bubble max-w-sm rounded-2xl border border-join-border bg-join-panel p-5 text-ink shadow-md sm:max-w-md"
+								>
+									<!-- Ticket Header -->
+									<div
+										class="mb-4 flex items-center justify-between border-b border-join-border/40 pb-3 select-none"
+									>
+										<div class="flex items-center gap-2">
+											<div
+												class="flex h-6 w-6 items-center justify-center rounded-full bg-primary font-bold text-white"
+											>
+												<Gamepad size={14} />
+											</div>
+											<span class="text-[11px] font-extrabold tracking-wider text-primary uppercase"
+												>Game Session</span
+											>
+										</div>
+										<span class="text-[11px] font-bold text-muted uppercase">
+											{#if gameSession.state === 'waiting'}
+												Waiting
+											{:else if gameSession.state === 'ongoing'}
+												Ongoing
+											{:else if gameSession.state === 'finished'}
+												Finished
+											{/if}
+										</span>
+									</div>
+
+									<!-- Ticket Body -->
+									<div class="flex items-start gap-4">
+										<div class="shrink-0 select-none">
+											<div
+												class="h-16 w-16 overflow-hidden rounded-xl border border-join-border/60 bg-base-300 shadow-inner"
+											>
+												<img src={game.image} alt={game.name} class="h-full w-full object-cover" />
+											</div>
+										</div>
+
+										<div class="min-w-0 flex-1">
+											<h3
+												class="truncate font-sans text-base leading-tight font-extrabold text-ink"
+											>
+												{game.name}
+											</h3>
+
+											<!-- Settings chips -->
+											<div class="mt-2.5 flex flex-wrap gap-1.5">
+												{#each Object.entries(gameSession.settings) as [key, value], i (i)}
+													{@const setting = $gamesStore[gameSession.gameId].settings![key]}
+													<div
+														class="badge h-5 gap-1 rounded-full border-none bg-card/70 px-2.5 py-0 font-sans text-[10px] font-semibold text-ink select-none"
+													>
+														<span class="text-[9px] font-bold uppercase opacity-60"
+															>{setting.name}:</span
+														>
+														<span class="max-w-15 truncate">
+															{#if typeof value === 'boolean'}
+																{value === true ? 'Yes' : 'No'}
+															{:else}
+																{Array.isArray(value) ? value.length : value}
+															{/if}
+														</span>
+													</div>
+												{/each}
+											</div>
 										</div>
 									</div>
 
-									<div class="flex-1 overflow-hidden">
-										<h3 class="flex items-center gap-2 text-sm leading-none font-bold">
-											{game.name}
-										</h3>
-
-										<div class="mt-2 flex flex-wrap gap-1">
-											{#each Object.entries(gameSession.settings) as [key, value], i (i)}
-												{@const setting = $gamesStore[gameSession.gameId].settings![key]}
+									<!-- Ticket Actions / Footer -->
+									{#if gameSession.state === 'waiting'}
+										<div class="mt-5 grid grid-cols-2 gap-3 border-t border-join-border/40 pt-4">
+											<JoinGameSessionButton gameSessionId={gameSession.id} />
+											<SpectateGameSessionButton gameSessionId={gameSession.id} />
+										</div>
+									{:else if gameSession.state === 'ongoing'}
+										<div class="mt-5 grid grid-cols-1 border-t border-join-border/40 pt-4">
+											<SpectateGameSessionButton gameSessionId={gameSession.id} />
+										</div>
+									{:else if gameSession.state === 'finished'}
+										<div class="mt-5 border-t border-join-border/40 pt-4">
+											{#if gameSession.winner}
+												{@const winner =
+													gameSession.winner === 'draw'
+														? 'draw'
+														: (getMemberFromId(gameSession.winner) ?? undefined)}
 												<div
-													class="badge h-4 gap-1 border-none badge-ghost bg-black/10 px-1.5 py-0 text-[10px] opacity-80"
+													class="flex items-center justify-center gap-2 rounded-xl border border-join-border/30 bg-card/40 p-3"
 												>
-													<span class="font-semibold uppercase">{setting.name}:</span>
-													<span class="max-w-15 truncate italic">
-														{#if typeof value === 'boolean'}
-															{value === true ? 'Yes' : 'No'}
-														{:else}
-															{Array.isArray(value) ? value.length : value}
-														{/if}
-													</span>
+													{#if winner === 'draw'}
+														<div
+															class="flex items-center gap-1.5 text-sm font-extrabold text-muted"
+														>
+															<span>🤝 Game Draw</span>
+														</div>
+													{:else if winner === undefined}
+														<div
+															class="flex items-center gap-1.5 text-sm font-extrabold text-muted"
+														>
+															<span>Game Ended</span>
+														</div>
+													{:else}
+														<div class="h-6 w-6 shrink-0">
+															<UserAvatar user={winner} />
+														</div>
+														<div class="truncate text-sm font-extrabold">
+															<span style="color: {getUserForeground(winner.color)};">
+																{winner.name}
+															</span>
+															<span class="text-ink">Won! 🏆</span>
+														</div>
+													{/if}
 												</div>
-											{/each}
-										</div>
-									</div>
-								</div>
-
-								{#if gameSession.state === 'waiting'}
-									<div class="mt-4 grid grid-cols-2 gap-2">
-										<JoinGameSessionButton gameSessionId={gameSession.id} />
-										<SpectateGameSessionButton gameSessionId={gameSession.id} />
-									</div>
-								{:else if gameSession.state === 'ongoing'}
-									<div class="mt-4 grid grid-cols-2 gap-2">
-										<SpectateGameSessionButton gameSessionId={gameSession.id} />
-									</div>
-								{:else if gameSession.state === 'finished'}
-									{#if gameSession.winner}
-										{@const winner =
-											gameSession.winner === 'draw'
-												? 'draw'
-												: (getMemberFromId(gameSession.winner) ?? undefined)}
-										<div class="mt-4 flex items-center gap-2">
-											{#if winner === 'draw'}
-												<div class="font-mono font-medium opacity-50">Game Draw</div>
-											{:else if winner === undefined}
-												<div class="font-mono font-medium opacity-50">Game Ended</div>
 											{:else}
-												<UserAvatar user={winner} />
-												<div class="font-medium">
-													<span style="color: {getUserForeground(winner.color)};">
-														{winner.name}
-													</span>
-													Won!
+												<div
+													class="rounded-lg bg-card/30 py-2 text-center text-xs font-semibold text-muted"
+												>
+													Game Expired
 												</div>
 											{/if}
 										</div>
-									{:else}
-										<div class="mt-4 font-mono font-medium opacity-50">Game Expired</div>
 									{/if}
-								{/if}
-							</div>
-						{:else}
-							<div class="chat-bubble chat-bubble-error text-xs italic">
-								Invite expired or game not found.
-							</div>
+								</div>
+							{:else}
+								<div class="chat-bubble chat-bubble-error text-xs italic">
+									Invite expired or game not found.
+								</div>
+							{/if}
 						{/if}
-					{/if}
-				</div>
-			{:else}
-				<div class="h-full flex flex-col items-center gap-4 justify-center opacity-20">
-					<MessageSquareDashed size={32} />
-					<p class="text-sm italic">No messages yet</p>
-				</div>
-			{/each}
-		</main>
+					</div>
+				{:else}
+					<div
+						class="h-full flex flex-col items-center gap-4 justify-center text-center p-8 select-none mx-auto my-auto opacity-70"
+					>
+						<div
+							class="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary border border-primary/20 animate-pulse"
+						>
+							<MessageSquareDashed size={32} />
+						</div>
+						<h3 class="font-sans text-lg font-extrabold text-ink">Welcome to the Lobby!</h3>
+					</div>
+				{/each}
+			</main>
 
-		{#if showScrollButton}
-			<button
-				class="btn fixed right-6 bottom-24 btn-circle shadow-lg btn-primary"
-				onclick={() => scrollToBottom()}
-			>
-				<ArrowDown size={16} />
-			</button>
-		{/if}
+			{#if showScrollButton}
+				<button
+					class="btn fixed right-6 bottom-24 z-40 btn-circle h-10 min-h-0 w-10 cursor-pointer border-none p-0 shadow-xl transition-all duration-200 btn-primary hover:scale-105 active:scale-95"
+					onclick={() => scrollToBottom()}
+					aria-label="Scroll to bottom"
+				>
+					<ArrowDown size={18} />
+				</button>
+			{/if}
 
-		<form
-			class="flex shrink-0 gap-2 border-t border-base-300 bg-base-100 p-4"
-			onsubmit={(e) => {
-				e.preventDefault();
-				handleSendTextMessage();
-			}}
-		>
-			<SendGameInviteButton />
-			<input
-				class="input-bordered input flex-1"
-				type="text"
-				placeholder="Type a message..."
-				bind:value={message}
-			/>
-			<button class="btn btn-square btn-accent" type="submit" disabled={!message.trim()}
-				><Send /></button
+			<form
+				class="flex shrink-0 gap-2 border-t border-hairline bg-card p-4"
+				onsubmit={(e) => {
+					e.preventDefault();
+					handleSendTextMessage();
+				}}
 			>
-		</form>
+				<SendGameInviteButton />
+				<input
+					class="h-12 flex-1 rounded-md border border-hairline bg-canvas/30 px-4 font-sans text-[16px] font-[600] text-ink placeholder-muted transition-colors focus:border-primary focus:outline-none"
+					type="text"
+					placeholder="Type a message..."
+					bind:value={message}
+				/>
+				<button
+					class="btn btn-square h-12 w-12 cursor-pointer rounded-md border-none transition-all duration-200 active:scale-95
+					{themeState.current === 'arc-dark'
+						? 'bg-accent-yellow text-[#20180A] hover:bg-[#e2b033]'
+						: 'bg-primary text-white hover:bg-primary/95'}"
+					type="submit"
+					disabled={!message.trim()}
+				>
+					<Send size={18} />
+				</button>
+			</form>
+		</div>
 	</div>
 
 	<div class="drawer-side z-50">
 		<label for="member-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
-		<div class="flex h-svh w-72 flex-col items-center border-r border-base-300 bg-base-100 pb-4">
+		<div class="flex h-svh w-72 flex-col items-center border-r border-hairline bg-card pb-4">
 			<div
-				class="flex w-full items-center justify-between border-b border-base-300 bg-base-200/50 p-4"
+				class="flex w-full items-center justify-between border-b border-hairline bg-canvas/30 p-4 select-none"
 			>
-				<h2 class="text-lg font-bold">Members</h2>
-				<div class="badge badge-primary">{$membersStore?.length}</div>
+				<h2 class="font-sans text-lg font-bold text-ink">Members</h2>
+				<div class="badge rounded-full px-2 py-1 text-xs font-bold badge-primary">
+					{$membersStore?.length}
+				</div>
 			</div>
-			<ul class="flex h-full w-full flex-col p-2">
+			<ul class="custom-scrollbar flex h-full w-full flex-col gap-1 overflow-y-auto p-2">
 				{#each $membersStore as member, i (i)}
+					{@const isMe = member.id === $userData.id}
 					<li>
-						<div class="flex items-center gap-2 px-4 py-2" style="color: {getUserForeground(member.color)}">
+						<div
+							class="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-200 hover:bg-canvas/40"
+							style="color: {getUserForeground(member.color)}"
+						>
 							<UserAvatar user={member} />
-							<!-- <span>{member.emoji}</span> -->
-							<span class="flex-1 truncate">{member.name}</span>
-							{#if member.id === $userData.id}
-								<span class="badge badge-sm badge-primary">You</span>
+							<span
+								class="flex-1 truncate font-sans text-sm font-semibold {isMe ? 'font-bold' : ''}"
+								>{member.name}</span
+							>
+							{#if isMe}
+								<span
+									class="badge rounded-md border-none bg-primary/10 px-1.5 py-0.5 badge-sm font-bold text-primary"
+									>You</span
+								>
 							{/if}
 						</div>
 					</li>
@@ -266,3 +397,20 @@
 		</div>
 	</div>
 </div>
+
+<style>
+	.custom-scrollbar::-webkit-scrollbar {
+		width: 4px;
+		height: 4px;
+	}
+	.custom-scrollbar::-webkit-scrollbar-track {
+		background: transparent;
+	}
+	.custom-scrollbar::-webkit-scrollbar-thumb {
+		background: rgba(124, 92, 252, 0.15);
+		border-radius: 10px;
+	}
+	.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+		background: rgba(124, 92, 252, 0.3);
+	}
+</style>
