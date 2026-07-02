@@ -13,7 +13,7 @@
 	const data = $derived({ session: $session as any, players: $players!, isPlayer });
 </script>
 
-<div class="flex h-svh w-screen flex-col">
+<div class="flex h-dvh w-screen flex-col">
 	{#if $session?.gameId === 'simple-game'}
 		<SimpleGameUI {...data} />
 	{:else if $session?.gameId === 'tic-tac-toe'}

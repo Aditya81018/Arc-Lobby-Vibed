@@ -102,10 +102,12 @@
 	});
 </script>
 
-<div class="drawer h-svh w-screen bg-canvas text-ink transition-colors duration-200 lg:drawer-open">
+<div
+	class="drawer h-dvh w-screen bg-canvas text-ink transition-colors duration-200 lg:drawer-open"
+>
 	<input id="member-drawer" type="checkbox" class="drawer-toggle" />
 
-	<div class="drawer-content flex h-svh flex-col overflow-hidden lg:p-4">
+	<div class="drawer-content flex h-dvh flex-col overflow-hidden lg:p-4">
 		<div
 			class="flex h-full w-full flex-col overflow-hidden border-hairline bg-card shadow-[0_8px_30px_rgb(0,0,0,0.02)] lg:rounded-2xl lg:border"
 		>
@@ -115,7 +117,7 @@
 
 					<div class="flex items-center gap-3">
 						<!-- Mini brand logo -->
-						<div class="mr-1 hidden items-center gap-1 sm:flex">
+						<div class="mr-1 hidden items-center gap-2 sm:flex">
 							<span class="font-display text-xl font-extrabold text-ink">Arc</span>
 							<span class="font-display text-xl font-extrabold text-primary">Lobby</span>
 						</div>
@@ -150,7 +152,7 @@
 			<main
 				bind:this={messagesContainer}
 				onscroll={handleScroll}
-				class="custom-scrollbar relative flex-1 space-y-4 overflow-y-auto bg-canvas/10 p-4"
+				class="custom-scrollbar relative flex-1 space-y-4 overflow-y-auto bg-canvas/45 p-4"
 			>
 				{#each $lobbyMessagesStore as msg, i (i)}
 					{@const isMe = msg.senderId === socket.id}
@@ -361,21 +363,24 @@
 
 	<div class="drawer-side z-50">
 		<label for="member-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
-		<div class="flex h-svh w-72 flex-col items-center border-r border-hairline bg-card pb-4">
+		<div
+			class="flex h-dvh w-72 flex-col items-center border-r border-hairline bg-card pb-4
+			lg:my-4 lg:mr-0 lg:ml-4 lg:h-[calc(100dvh-2rem)] lg:rounded-2xl lg:border lg:border-hairline lg:bg-canvas/40 lg:shadow-[0_8px_30px_rgb(0,0,0,0.01)] lg:backdrop-blur-sm"
+		>
 			<div
-				class="flex w-full items-center justify-between border-b border-hairline bg-canvas/30 p-4 select-none"
+				class="flex w-full items-center justify-between border-b border-hairline bg-canvas/30 p-4 select-none lg:border-b-hairline/40 lg:bg-transparent"
 			>
 				<h2 class="font-sans text-lg font-bold text-ink">Members</h2>
 				<div class="badge rounded-full px-2 py-1 text-xs font-bold badge-primary">
 					{$membersStore?.length}
 				</div>
 			</div>
-			<ul class="custom-scrollbar flex h-full w-full flex-col gap-1 overflow-y-auto p-2">
+			<ul class="custom-scrollbar flex h-full w-full flex-col gap-2 overflow-y-auto p-3">
 				{#each $membersStore as member, i (i)}
 					{@const isMe = member.id === $userData.id}
 					<li>
 						<div
-							class="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-200 hover:bg-canvas/40"
+							class="flex items-center gap-3 rounded-xl border border-hairline/40 bg-card/45 px-3 py-2.5 shadow-[0_2px_8px_rgba(0,0,0,0.01)] transition-all duration-200 hover:scale-[1.02] hover:border-hairline hover:bg-card hover:shadow-sm"
 							style="color: {getUserForeground(member.color)}"
 						>
 							<UserAvatar user={member} />
