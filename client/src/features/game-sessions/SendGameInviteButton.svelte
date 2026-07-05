@@ -63,7 +63,7 @@
 </script>
 
 <button
-	class="btn btn-square h-12 w-12 rounded-md shadow-sm border border-hairline bg-card text-ink hover:bg-base-300 btn-ghost cursor-pointer transition-all active:scale-95"
+	class="btn btn-square h-12 w-12 cursor-pointer rounded-md border border-hairline bg-accent-mint text-white shadow-sm btn-ghost transition-all hover:bg-accent-mint/80 active:scale-95"
 	type="button"
 	onclick={openModal}
 	title="Send Game Invite"
@@ -75,7 +75,9 @@
 	{#if isLoading}
 		<LoadingScreen />
 	{/if}
-	<div class="modal-box flex flex-col overflow-hidden border border-hairline bg-card p-0 shadow-[0_20px_50px_rgba(0,0,0,0.3)]">
+	<div
+		class="modal-box flex flex-col overflow-hidden border border-hairline bg-card p-0 shadow-[0_20px_50px_rgba(0,0,0,0.3)]"
+	>
 		<div class="flex items-center justify-between border-b border-hairline bg-canvas/30 px-6 py-4">
 			<div class="flex items-center gap-3">
 				{#if selectedGame}
@@ -83,7 +85,9 @@
 						<ChevronLeft size={20} />
 					</button>
 				{/if}
-				<h3 class="font-sans text-lg font-[800] text-ink">{selectedGame ? selectedGame.name : 'Select Game'}</h3>
+				<h3 class="font-sans text-lg font-[800] text-ink">
+					{selectedGame ? selectedGame.name : 'Select Game'}
+				</h3>
 			</div>
 			<button
 				class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-muted transition-colors hover:bg-black/5 dark:hover:bg-white/5"
@@ -94,13 +98,13 @@
 			</button>
 		</div>
 
-		<div class="custom-scrollbar overflow-y-auto px-6 pb-6 pt-4">
+		<div class="custom-scrollbar overflow-y-auto px-6 pt-4 pb-6">
 			{#if !selectedGame}
 				<div class="grid grid-cols-2 gap-4 md:grid-cols-3">
 					{#each Object.values($gamesStore) as game, i (i)}
 						<button
 							onclick={() => handleGameSelect(game)}
-							class="group relative aspect-[4/3] overflow-hidden rounded-xl border border-hairline bg-base-300 transition-all duration-300 hover:scale-[1.02] active:scale-95 cursor-pointer"
+							class="group relative aspect-[4/3] cursor-pointer overflow-hidden rounded-xl border border-hairline bg-base-300 transition-all duration-300 hover:scale-[1.02] active:scale-95"
 						>
 							<img
 								src={game.image}
@@ -118,7 +122,9 @@
 					{#each Object.values(selectedGame.settings || {}) as setting, i (i)}
 						<div class="flex items-center gap-4 py-5 first:pt-0">
 							<!-- svelte-ignore a11y_label_has_associated_control -->
-							<label class="block font-sans text-xs font-[700] tracking-[0.3px] text-body uppercase select-none">
+							<label
+								class="block font-sans text-xs font-[700] tracking-[0.3px] text-body uppercase select-none"
+							>
 								{setting.name}:
 							</label>
 
@@ -132,11 +138,11 @@
 								<div class="flex flex-wrap gap-2">
 									{#each setting.options as option, i (i)}
 										<button
-											class="no-animation btn rounded-md font-sans text-xs font-semibold btn-sm transition-all duration-200 cursor-pointer {settingsValues[
+											class="no-animation btn cursor-pointer rounded-md font-sans text-xs font-semibold transition-all duration-200 btn-sm {settingsValues[
 												setting.id
 											] === option.value
-												? 'bg-primary text-white border-none shadow-sm'
-												: 'border border-hairline bg-canvas hover:bg-base-300 text-ink'}"
+												? 'border-none bg-primary text-white shadow-sm'
+												: 'border border-hairline bg-canvas text-ink hover:bg-base-300'}"
 											onclick={() => (settingsValues[setting.id] = option.value)}
 										>
 											{option.name}
@@ -147,11 +153,11 @@
 								<div class="flex flex-wrap gap-2">
 									{#each setting.options as option, i (i)}
 										<button
-											class="no-animation btn rounded-md font-sans text-xs font-semibold btn-sm transition-all duration-200 cursor-pointer {settingsValues[
+											class="no-animation btn cursor-pointer rounded-md font-sans text-xs font-semibold transition-all duration-200 btn-sm {settingsValues[
 												setting.id
 											].includes(option.value)
-												? 'bg-primary text-white border-none shadow-sm'
-												: 'border border-hairline bg-canvas hover:bg-base-300 text-ink'}"
+												? 'border-none bg-primary text-white shadow-sm'
+												: 'border border-hairline bg-canvas text-ink hover:bg-base-300'}"
 											onclick={() => toggleMultiSelect(setting.id, option.value)}
 										>
 											{option.name}
@@ -166,9 +172,9 @@
 		</div>
 
 		{#if selectedGame}
-			<div class="bg-card p-6 pt-2 border-t border-hairline">
+			<div class="border-t border-hairline bg-card p-6 pt-2">
 				<button
-					class="btn h-12 btn-block rounded-md font-sans font-bold text-sm border-none shadow-md transition-all active:scale-95 bg-primary text-white hover:bg-primary/95 cursor-pointer"
+					class="btn h-12 btn-block cursor-pointer rounded-md border-none bg-primary font-sans text-sm font-bold text-white shadow-md transition-all hover:bg-primary/95 active:scale-95"
 					disabled={isLoading}
 					onclick={handleSendGameInvite}
 				>

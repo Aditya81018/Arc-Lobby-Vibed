@@ -3,9 +3,14 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently -n \"client,server\" -c \"blue,green\" \"pnpm -C client dev\" \"pnpm -C server dev\""
+    "dev": "concurrently -n \"client,server\" -c \"blue,green\" \"pnpm -C client dev\" \"pnpm -C server dev\"",
+    "test": "node scripts/run-tests.js"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"
+  },
+  "dependencies": {
+    "assert": "^2.1.0",
+    "socket.io-client": "^4.8.3"
   }
 }

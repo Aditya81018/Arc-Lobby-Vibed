@@ -20,8 +20,8 @@ export function getUserById(id: string) {
 
 export function createUser(id: string, data: Omit<UserData, "id">) {
   const newUser: UserData = {
-    id,
     ...data,
+    id,
   };
   users.set(id, newUser);
   return newUser;
@@ -31,7 +31,7 @@ export function updateUser(id: string, newData: Partial<Omit<UserData, "id">>) {
   const oldData = users.get(id);
   if (!oldData) return undefined;
 
-  const updatedData = Object.assign(oldData, newData);
+  const updatedData = { ...oldData, ...newData, id };
   users.set(id, updatedData);
   return updatedData;
 }
