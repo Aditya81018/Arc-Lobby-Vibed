@@ -102,9 +102,7 @@
 	});
 </script>
 
-<div
-	class="drawer h-dvh w-screen bg-canvas text-ink transition-colors duration-200 lg:drawer-open"
->
+<div class="drawer h-dvh w-screen bg-canvas text-ink transition-colors duration-200 lg:drawer-open">
 	<input id="member-drawer" type="checkbox" class="drawer-toggle" />
 
 	<div class="drawer-content flex h-dvh flex-col overflow-hidden lg:p-4">
@@ -181,7 +179,7 @@
 
 							{#if gameSession && game}
 								<div
-									class="animate-fade-in chat-bubble max-w-sm rounded-2xl border border-join-border bg-join-panel p-5 text-ink shadow-md sm:max-w-md"
+									class="animate-fade-in chat-bubble rounded-2xl border border-join-border bg-join-panel p-5 text-ink shadow-md"
 								>
 									<!-- Ticket Header -->
 									<div
