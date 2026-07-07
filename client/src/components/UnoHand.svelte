@@ -17,6 +17,7 @@
 		maxAngleSpan?: number;
 		onclickCard?: (card: Card, index: number) => void;
 		selectedCardIndex?: number | null;
+		isCardPlayable?: (card: Card, index: number) => boolean;
 	}
 
 	let {
@@ -29,7 +30,8 @@
 		archDepth = 0,
 		maxAngleSpan = 90,
 		onclickCard,
-		selectedCardIndex = null
+		selectedCardIndex = null,
+		isCardPlayable
 	}: Props = $props();
 
 	// Automatically derive height and max-width based on card size to prevent clipping
@@ -109,7 +111,7 @@
 				color={card.color}
 				value={card.value}
 				size={cardSize}
-				{playable}
+				playable={playable && (isCardPlayable ? isCardPlayable(card, idx) : true)}
 				{shadowDepth}
 				selected={selectedCardIndex === idx}
 				onclick={() => onclickCard?.(card, idx)}
@@ -121,7 +123,9 @@
 <style>
 	.playable-wrapper {
 		/* Establish a transition context for clean hover effects */
-		transition: transform 0.3s ease, z-index 0s;
+		transition:
+			transform 0.3s ease,
+			z-index 0s;
 	}
 	.playable-wrapper:hover {
 		z-index: 1000 !important;

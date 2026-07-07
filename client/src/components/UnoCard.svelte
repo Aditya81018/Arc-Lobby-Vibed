@@ -190,7 +190,9 @@
 	let backColor = $derived(colors.wild);
 
 	// Determine if size preset matches
-	let isSizePreset = $derived(size === 'xs' || size === 'sm' || size === 'md' || size === 'lg' || size === 'xl');
+	let isSizePreset = $derived(
+		size === 'xs' || size === 'sm' || size === 'md' || size === 'lg' || size === 'xl'
+	);
 	let spec = $derived(isSizePreset ? sizeSpecs[size as keyof typeof sizeSpecs] : sizeSpecs.md);
 
 	// Large center icon size calculation for action cards (skip and reverse)

@@ -1,11 +1,13 @@
 import { GameSession } from "../../features/game-sessions";
 import simpleGame from "./simple-game";
 import ticTacToe from "./tic-tac-toe";
+import luno from "./luno";
 import { Game } from "./types";
 
 const GAMES: Record<string, Game<any>> = {
   "simple-game": simpleGame,
   "tic-tac-toe": ticTacToe,
+  luno: luno,
 };
 
 export default GAMES;

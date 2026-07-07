@@ -26,4 +26,9 @@
 {#if isLoading}
 	<LoadingScreen />
 {/if}
-<button onclick={handleJoinGameSession} class="btn h-10 w-full rounded-md font-sans text-xs font-bold transition-all duration-200 shadow-md active:scale-95 bg-primary text-white border-none hover:bg-primary/90 cursor-pointer"> Join Game </button>
+<button
+	onclick={handleJoinGameSession}
+	class="btn h-10 w-full rounded-md font-sans text-xs font-bold transition-all duration-200 shadow-md active:scale-95 bg-primary text-white border-none hover:bg-primary/90 cursor-pointer"
+>
+	Join Game
+</button>

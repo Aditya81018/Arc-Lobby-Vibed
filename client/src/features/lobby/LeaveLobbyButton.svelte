@@ -10,4 +10,3 @@
 	<LogOut size={16} />
 	<span>Leave Lobby</span>
 </a>
-

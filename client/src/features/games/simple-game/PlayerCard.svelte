@@ -49,7 +49,9 @@
 	{#if isPlayerTurn && timeLeft !== 0}
 		<div
 			class="radial-progress"
-			style="--value:{timeLeft * 10}; color: {getUserForeground(player?.color)}; --size: 48px; --thickness: 4px"
+			style="--value:{timeLeft * 10}; color: {getUserForeground(
+				player?.color
+			)}; --size: 48px; --thickness: 4px"
 		>
 			<UserAvatar user={player} />
 		</div>

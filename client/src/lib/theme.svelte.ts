@@ -6,7 +6,8 @@ export const themeState = $state({
 
 export function initTheme() {
 	if (!browser) return;
-	const savedTheme = localStorage.getItem('theme') || 
+	const savedTheme =
+		localStorage.getItem('theme') ||
 		(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'arc-dark' : 'arc-light');
 	themeState.current = savedTheme;
 	document.documentElement.setAttribute('data-theme', savedTheme);

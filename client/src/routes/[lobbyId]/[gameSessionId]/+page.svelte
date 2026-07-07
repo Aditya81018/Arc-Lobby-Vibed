@@ -5,6 +5,7 @@
 	} from '../../../features/game-sessions/store';
 	import SimpleGameUI from '../../../features/games/simple-game/SimpleGameUI.svelte';
 	import TicTacToeUI from '../../../features/games/tic-tac-toe/TicTacToeUI.svelte';
+	import LunoUI from '../../../features/games/luno/LunoUI.svelte';
 	import { userData } from '../../../features/user/store';
 
 	const isPlayer = $derived($session?.players.includes($userData.id) || false);
@@ -18,6 +19,8 @@
 		<SimpleGameUI {...data} />
 	{:else if $session?.gameId === 'tic-tac-toe'}
 		<TicTacToeUI {...data} />
+	{:else if $session?.gameId === 'luno'}
+		<LunoUI {...data} />
 	{:else}
 		No session
 	{/if}
