@@ -21,6 +21,25 @@
 
 	// Self-contained pixel dimensions to bypass dynamic Tailwind compilation
 	const sizeSpecs = {
+		xs: {
+			width: '60px',
+			height: '90px',
+			borderRadius: '6px',
+			borderWidth: '2px',
+			innerBorderInset: '3px',
+			innerBorderWidth: '1px',
+			innerBorderRadius: '4px',
+			ovalWidth: '50px',
+			ovalHeight: '24px',
+			fontSizeCenter: '18px',
+			fontSizeCorner: '9px',
+			cornerOffset: '6px',
+			cornerIconSize: 8,
+			backOvalWidth: '46px',
+			backOvalHeight: '24px',
+			backFontSize: '11px',
+			svgSize: 16
+		},
 		sm: {
 			width: '80px',
 			height: '120px',
@@ -118,7 +137,7 @@
 			| 'wild'
 			| 'wild-draw-four'
 			| string;
-		size?: 'sm' | 'md' | 'lg' | 'xl' | string;
+		size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | string;
 		themePreset?: 'arc' | 'classic';
 		faceDown?: boolean;
 		playable?: boolean;
@@ -171,12 +190,13 @@
 	let backColor = $derived(colors.wild);
 
 	// Determine if size preset matches
-	let isSizePreset = $derived(size === 'sm' || size === 'md' || size === 'lg' || size === 'xl');
+	let isSizePreset = $derived(size === 'xs' || size === 'sm' || size === 'md' || size === 'lg' || size === 'xl');
 	let spec = $derived(isSizePreset ? sizeSpecs[size as keyof typeof sizeSpecs] : sizeSpecs.md);
 
 	// Large center icon size calculation for action cards (skip and reverse)
 	let centerIconSize = $derived.by(() => {
 		if (value === 'skip' || value === 'reverse') {
+			if (size === 'xs') return 20;
 			if (size === 'sm') return 28;
 			if (size === 'md') return 44;
 			if (size === 'lg') return 56;
@@ -555,6 +575,9 @@
 	}
 
 	/* Retro shadows - Use :global to prevent Svelte from pruning dynamic bindings */
+	:global(.shadow-retro-xs) {
+		box-shadow: 2px 2px 0px var(--ink) !important;
+	}
 	:global(.shadow-retro-sm) {
 		box-shadow: 3px 3px 0px var(--ink) !important;
 	}
