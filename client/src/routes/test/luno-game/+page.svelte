@@ -172,7 +172,7 @@
 			e.stopPropagation();
 			drawRandomCard();
 		}}
-		class="group absolute right-4 bottom-68 z-50 flex cursor-pointer flex-col items-center gap-2 border-0 bg-transparent transition-all duration-100 outline-none active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+		class="group absolute bottom-68 z-50 flex md:translate-x-40 cursor-pointer flex-col items-center gap-2 border-0 bg-transparent transition-all duration-100 outline-none active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 max-md:right-4"
 		disabled={drawPileCount === 0}
 		title="Draw a random card"
 	>
