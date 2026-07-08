@@ -53,7 +53,7 @@
 	{#if isPlayerTurn && timeLeft !== 0}
 		<div
 			class="radial-progress"
-			style="--value:{timeLeft * 10}; color: {getUserForeground(
+			style="--value:{(timeLeft / 30) * 100}; color: {getUserForeground(
 				player?.color
 			)}; --size: 48px; --thickness: 4px"
 		>
@@ -77,7 +77,7 @@
 
 	{#if player !== undefined && session.state !== 'waiting'}
 		<div class="flex flex-col items-center">
-			<span class="font-mono text-xs font-bold text-white/50">
+			<span class="font-mono text-xs font-bold text-ink/50">
 				{cardCount}
 				{cardCount === 1 ? 'Card' : 'Cards'}
 			</span>

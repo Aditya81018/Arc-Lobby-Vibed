@@ -186,7 +186,7 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
-	class="relative flex h-full w-full flex-col bg-[#0A0D18] p-4 overflow-hidden"
+	class="relative flex h-full w-full flex-col bg-canvas text-ink transition-colors duration-200 p-4 overflow-hidden"
 	onclick={handleBackgroundClick}
 >
 	<LeaveGameSessionButton />
@@ -195,10 +195,10 @@
 		{#if session.state === 'finished'}
 			{@const winner = players.find((player) => player?.id === session.winner)}
 			<div
-				class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-[#0a0d18]/90 backdrop-blur-sm p-4 text-center animate-scaleUp pointer-events-auto"
+				class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-canvas/90 backdrop-blur-sm p-4 text-center animate-scaleUp pointer-events-auto"
 			>
 				<div
-					class="max-w-md w-full p-6 rounded-2xl border border-[#232840] bg-[#12162a] flex flex-col items-center gap-6 shadow-2xl"
+					class="max-w-md w-full p-6 rounded-2xl border border-hairline bg-card flex flex-col items-center gap-6 shadow-2xl"
 				>
 					<div class="flex flex-col items-center gap-2">
 						{#if winner}
@@ -212,22 +212,22 @@
 								<span class="absolute -top-2 -right-2 text-3xl animate-bounce">👑</span>
 							</div>
 						{/if}
-						<h2 class="text-3xl font-extrabold font-display text-white mt-2">
+						<h2 class="text-3xl font-extrabold font-display text-ink mt-2">
 							{winner?.name ?? 'Unknown'} Won!
 						</h2>
 					</div>
 
 					<!-- Leaderboard / Standings -->
 					<div class="w-full flex flex-col gap-2 max-h-48 overflow-y-auto pr-1">
-						{#each players as player}
+						{#each players as player, idx (player?.id ?? idx)}
 							{#if player !== undefined}
-								{@const pIdx = players.indexOf(player)}
+								{@const pIdx = idx}
 								{@const pData = session.data.playersData[pIdx]}
 								{@const isWinner = player.id === session.winner}
 								<div
 									class="flex items-center justify-between p-3 rounded-xl {isWinner
-										? 'bg-[#7C5CFC]/20 border border-[#7C5CFC]/40'
-										: 'bg-[#1b1f38] border border-white/5'}"
+										? 'bg-primary/20 border border-primary/40'
+										: 'bg-canvas/50 border border-hairline/50'}"
 								>
 									<div class="flex items-center gap-3">
 										<div
@@ -236,7 +236,7 @@
 										>
 											{player.emoji}
 										</div>
-										<span class="font-semibold text-sm text-white {isWinner ? 'font-bold' : ''}">
+										<span class="font-semibold text-sm text-ink {isWinner ? 'font-bold' : ''}">
 											{player.name}
 											{#if player.id === $user.id}
 												<span class="opacity-60 text-xs font-normal">(You)</span>
@@ -249,7 +249,7 @@
 												Winner
 											</span>
 										{:else}
-											<span class="font-mono text-sm font-bold text-white/70">
+											<span class="font-mono text-sm font-bold text-ink/70">
 												{pData?.hand?.length ?? 0}
 												{pData?.hand?.length === 1 ? 'Card' : 'Cards'}
 											</span>
@@ -310,7 +310,7 @@
 						</div>
 					</div>
 					<!-- Label -->
-					<span class="mt-3 font-mono text-[9px] font-[700] tracking-wider text-white/50 uppercase">
+					<span class="mt-3 font-mono text-[9px] font-[700] tracking-wider text-ink/50 uppercase">
 						{#if session.data.accumulatedDrawCount > 0}
 							Draw +{session.data.accumulatedDrawCount} ({session.data.drawPileCount})
 						{:else}
@@ -357,7 +357,7 @@
 					<div
 						class="absolute left-1/2 -translate-x-1/2 bottom-72 md:bottom-120 text-center px-4 max-w-sm pointer-events-auto"
 					>
-						<p class="text-sm font-semibold tracking-wide text-white/70">
+						<p class="text-sm font-semibold tracking-wide text-ink/70">
 							{session.data.message}
 						</p>
 						{#if isPlayerTurn}
@@ -417,10 +417,10 @@
 				<div
 					class="flex flex-col items-center justify-center gap-1 z-50 pointer-events-none select-none"
 				>
-					<div class="text-2xl font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+					<div class="text-2xl font-bold text-ink">
 						Waiting for players...
 					</div>
-					<div class="text-sm font-mono tracking-widest text-white/60">
+					<div class="text-sm font-mono tracking-widest text-ink/60">
 						({session.players.length}/{session.settings['players-count']})
 					</div>
 				</div>
@@ -434,9 +434,9 @@
 			class="fixed inset-0 z-[1100] flex items-center justify-center bg-black/50 transition-opacity duration-300"
 		>
 			<div
-				class="flex flex-col items-center gap-4 p-4 rounded-xl bg-[#12162A] border border-[#232840] shadow-2xl max-w-[280px] w-full mx-4 text-center animate-scaleUp"
+				class="flex flex-col items-center gap-4 p-4 rounded-xl bg-card border border-hairline shadow-2xl max-w-[280px] w-full mx-4 text-center animate-scaleUp"
 			>
-				<div class="text-lg text-white font-bold">Pick a color</div>
+				<div class="text-lg text-ink font-bold">Pick a color</div>
 				<div class="grid grid-cols-2 gap-3 w-full">
 					<button
 						onclick={() => selectColor('red')}
@@ -470,7 +470,7 @@
 						showColorSelector = false;
 						pendingDiscardIdx = null;
 					}}
-					class="btn btn-ghost btn-xs text-gray-500 hover:text-white"
+					class="btn btn-ghost btn-xs text-muted hover:text-ink"
 				>
 					Cancel
 				</button>

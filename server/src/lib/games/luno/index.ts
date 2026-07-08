@@ -5,7 +5,7 @@ import { publicLinkTo } from "../../helpers";
 import { io } from "../../..";
 import { getUserById } from "../../../features/users";
 
-const TURN_INTERVAL = 10 * 1000; // 10 seconds
+const TURN_INTERVAL = 30 * 1000; // 30 seconds
 
 interface Card {
   color: string;
