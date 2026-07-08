@@ -212,8 +212,13 @@ const luno: Game<LunoSession> = {
         let nextDraw = 0;
 
         if (card.value === "reverse") {
-          this.data.direction = (this.data.direction === 1 ? -1 : 1);
-          this.data.message = `${user?.name || "Someone"} reversed direction`;
+          if (this.players.length === 2) {
+            skipNext = true;
+            this.data.message = `${user?.name || "Someone"} played Reverse to get another turn`;
+          } else {
+            this.data.direction = (this.data.direction === 1 ? -1 : 1);
+            this.data.message = `${user?.name || "Someone"} reversed direction`;
+          }
         } else if (card.value === "skip") {
           skipNext = true;
           this.data.message = `${user?.name || "Someone"} skipped the next player`;

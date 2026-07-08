@@ -35,6 +35,12 @@
 			? session.data.playersData[selfIndex].hand
 			: []
 	);
+	let shouldHighlightDrawPile = $derived(
+		isPlayerTurn &&
+			hand.length > 0 &&
+			session.data.drawPileCount > 0 &&
+			!hand.some((card) => isCardPlayable(card))
+	);
 
 	let selectedCardIndex = $state<number | null>(null);
 	let isMobile = $state(false);
@@ -213,7 +219,9 @@
 					title="Draw a card"
 				>
 					<div
-						class="relative h-[80px] w-[54px] transition-transform duration-200 group-hover:-translate-y-1"
+						class="relative h-[80px] w-[54px] transition-transform duration-200 group-hover:-translate-y-1 {shouldHighlightDrawPile
+							? 'draw-pile-highlight'
+							: ''}"
 					>
 						<!-- Stack effect cards underneath -->
 						<div
@@ -234,7 +242,7 @@
 						</div>
 					</div>
 					<!-- Label -->
-					<span class="mt-1 font-mono text-[9px] font-[700] tracking-wider text-white/50 uppercase">
+					<span class="mt-3 font-mono text-[9px] font-[700] tracking-wider text-white/50 uppercase">
 						Draw ({session.data.drawPileCount})
 					</span>
 				</button>
@@ -513,5 +521,19 @@
 	}
 	.animate-scaleUp {
 		animation: scaleUp 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+	}
+	.draw-pile-highlight {
+		animation: draw-pile-pulse 2s infinite ease-in-out;
+	}
+	@keyframes draw-pile-pulse {
+		0%,
+		100% {
+			transform: translateY(0);
+			filter: drop-shadow(0 0 2px rgba(124, 92, 252, 0.4));
+		}
+		50% {
+			transform: translateY(-12px);
+			filter: drop-shadow(0 0 10px rgba(124, 92, 252, 0.8));
+		}
 	}
 </style>
