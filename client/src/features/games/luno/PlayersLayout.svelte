@@ -37,14 +37,14 @@
 		<div class="absolute top-2"><PlayerCard {...getPlayerCardPropsFor(1)} /></div>
 	{:else if playersCount === 3}
 		<div class="absolute bottom-2"><PlayerCard {...getPlayerCardPropsFor(0)} /></div>
-		<div class="absolute left-2"><PlayerCard {...getPlayerCardPropsFor(1)} /></div>
-		<div class="absolute right-2"><PlayerCard {...getPlayerCardPropsFor(2)} /></div>
+		<div class="absolute left-2 top-[35%] md:top-1/2 md:-translate-y-1/2"><PlayerCard {...getPlayerCardPropsFor(1)} /></div>
+		<div class="absolute right-2 top-[35%] md:top-1/2 md:-translate-y-1/2"><PlayerCard {...getPlayerCardPropsFor(2)} /></div>
 	{:else}
 		<!-- 4 players layout -->
 		<div class="absolute bottom-2"><PlayerCard {...getPlayerCardPropsFor(0)} /></div>
-		<div class="absolute left-2"><PlayerCard {...getPlayerCardPropsFor(1)} /></div>
+		<div class="absolute left-2 top-[35%] md:top-1/2 md:-translate-y-1/2"><PlayerCard {...getPlayerCardPropsFor(1)} /></div>
 		<div class="absolute top-2"><PlayerCard {...getPlayerCardPropsFor(2)} /></div>
-		<div class="absolute right-2"><PlayerCard {...getPlayerCardPropsFor(3)} /></div>
+		<div class="absolute right-2 top-[35%] md:top-1/2 md:-translate-y-1/2"><PlayerCard {...getPlayerCardPropsFor(3)} /></div>
 	{/if}
 
 	{@render children()}

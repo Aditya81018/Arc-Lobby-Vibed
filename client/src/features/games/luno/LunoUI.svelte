@@ -194,11 +194,76 @@
 	<PlayersLayout {players} playersData={session.data.playersData} {session}>
 		{#if session.state === 'finished'}
 			{@const winner = players.find((player) => player?.id === session.winner)}
-			<div class="flex flex-col items-center gap-4 z-50">
-				<div class="text-4xl font-black text-white">{winner?.name ?? 'Unknown'} Won!</div>
-				<div class="flex gap-2">
-					<RematchButton {session} />
-					<BackToLobbyButton {session} />
+			<div
+				class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-[#0a0d18]/90 backdrop-blur-sm p-4 text-center animate-scaleUp pointer-events-auto"
+			>
+				<div
+					class="max-w-md w-full p-6 rounded-2xl border border-[#232840] bg-[#12162a] flex flex-col items-center gap-6 shadow-2xl"
+				>
+					<div class="flex flex-col items-center gap-2">
+						{#if winner}
+							<div class="relative">
+								<div
+									class="w-20 h-20 rounded-full flex items-center justify-center text-4xl shadow-md border-2 border-[#7C5CFC]"
+									style="background-color: {getUserBackground(winner.color)};"
+								>
+									{winner.emoji}
+								</div>
+								<span class="absolute -top-2 -right-2 text-3xl animate-bounce">👑</span>
+							</div>
+						{/if}
+						<h2 class="text-3xl font-extrabold font-display text-white mt-2">
+							{winner?.name ?? 'Unknown'} Won!
+						</h2>
+					</div>
+
+					<!-- Leaderboard / Standings -->
+					<div class="w-full flex flex-col gap-2 max-h-48 overflow-y-auto pr-1">
+						{#each players as player}
+							{#if player !== undefined}
+								{@const pIdx = players.indexOf(player)}
+								{@const pData = session.data.playersData[pIdx]}
+								{@const isWinner = player.id === session.winner}
+								<div
+									class="flex items-center justify-between p-3 rounded-xl {isWinner
+										? 'bg-[#7C5CFC]/20 border border-[#7C5CFC]/40'
+										: 'bg-[#1b1f38] border border-white/5'}"
+								>
+									<div class="flex items-center gap-3">
+										<div
+											class="w-8 h-8 rounded-full flex items-center justify-center text-lg"
+											style="background-color: {getUserBackground(player.color)};"
+										>
+											{player.emoji}
+										</div>
+										<span class="font-semibold text-sm text-white {isWinner ? 'font-bold' : ''}">
+											{player.name}
+											{#if player.id === $user.id}
+												<span class="opacity-60 text-xs font-normal">(You)</span>
+											{/if}
+										</span>
+									</div>
+									<div class="flex items-center gap-1.5">
+										{#if isWinner}
+											<span class="badge badge-primary badge-sm font-bold tracking-wider uppercase">
+												Winner
+											</span>
+										{:else}
+											<span class="font-mono text-sm font-bold text-white/70">
+												{pData?.hand?.length ?? 0}
+												{pData?.hand?.length === 1 ? 'Card' : 'Cards'}
+											</span>
+										{/if}
+									</div>
+								</div>
+							{/if}
+						{/each}
+					</div>
+
+					<div class="flex gap-4 w-full justify-center">
+						<RematchButton {session} />
+						<BackToLobbyButton {session} />
+					</div>
 				</div>
 			</div>
 		{:else}
@@ -290,7 +355,7 @@
 				<!-- Live Game Message Overlay -->
 				{#if session.state === 'ongoing'}
 					<div
-						class="absolute bottom-[18rem] md:bottom-[20rem] text-center px-4 max-w-sm pointer-events-auto"
+						class="absolute left-1/2 -translate-x-1/2 bottom-72 md:bottom-120 text-center px-4 max-w-sm pointer-events-auto"
 					>
 						<p class="text-sm font-semibold tracking-wide text-white/70">
 							{session.data.message}
@@ -309,7 +374,7 @@
 			<!-- Player's custom fan hand and identity card at the bottom -->
 			{#if isPlayer}
 				<div
-					class="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-lg px-4 flex flex-col items-center gap-4 select-none {session.state ===
+					class="absolute bottom-1 md:bottom-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-lg px-4 flex flex-col items-center gap-1 md:gap-4 select-none {session.state ===
 					'waiting'
 						? 'opacity-25 pointer-events-none'
 						: ''}"
