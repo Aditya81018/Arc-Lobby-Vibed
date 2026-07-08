@@ -36,6 +36,7 @@ interface LunoData {
   drawPileCount: number;
   nextTimestamp: number | undefined;
   message: string;
+  accumulatedDrawCount: number;
 }
 
 interface LunoSession extends GameSession {
@@ -132,15 +133,22 @@ const luno: Game<LunoSession> = {
         const playerData = this.data.playersData[this.data.turnOf];
         if (!playerData) return;
 
-        const card = getRandomCard();
-        playerData.hand.push(card);
-        this.data.drawPileCount = Math.max(0, this.data.drawPileCount - 1);
+        const drawCount = this.data.accumulatedDrawCount > 0 ? this.data.accumulatedDrawCount : 1;
+        for (let i = 0; i < drawCount; i++) {
+          playerData.hand.push(getRandomCard());
+        }
+        this.data.drawPileCount = Math.max(0, this.data.drawPileCount - drawCount);
         if (this.data.drawPileCount <= 0) {
           this.data.drawPileCount = 40;
         }
 
         const user = getUserById(playerId);
-        this.data.message = `${user?.name || "Someone"} drew a card`;
+        if (this.data.accumulatedDrawCount > 0) {
+          this.data.message = `${user?.name || "Someone"} drew ${drawCount} cards`;
+          this.data.accumulatedDrawCount = 0;
+        } else {
+          this.data.message = `${user?.name || "Someone"} drew a card`;
+        }
 
         this.nextTurn();
         this.resetTimer();
@@ -160,7 +168,12 @@ const luno: Game<LunoSession> = {
         if (!card) return;
 
         const topCard = this.data.discardPile[this.data.discardPile.length - 1];
-        const isPlayable = card.color === "wild" || card.color === topCard.color || card.value === topCard.value;
+        let isPlayable = false;
+        if (this.data.accumulatedDrawCount > 0) {
+          isPlayable = card.value === "draw-two" || card.value === "wild-draw-four";
+        } else {
+          isPlayable = card.color === "wild" || card.color === topCard.color || card.value === topCard.value;
+        }
         if (!isPlayable) return;
 
         // Discard card from hand
@@ -209,7 +222,6 @@ const luno: Game<LunoSession> = {
 
         // Apply special card effects
         let skipNext = false;
-        let nextDraw = 0;
 
         if (card.value === "reverse") {
           if (this.players.length === 2) {
@@ -223,12 +235,10 @@ const luno: Game<LunoSession> = {
           skipNext = true;
           this.data.message = `${user?.name || "Someone"} skipped the next player`;
         } else if (card.value === "draw-two") {
-          skipNext = true;
-          nextDraw = 2;
+          this.data.accumulatedDrawCount = (this.data.accumulatedDrawCount || 0) + 2;
           this.data.message = `${user?.name || "Someone"} played Draw 2`;
         } else if (card.value === "wild-draw-four") {
-          skipNext = true;
-          nextDraw = 4;
+          this.data.accumulatedDrawCount = (this.data.accumulatedDrawCount || 0) + 4;
           this.data.message = `${user?.name || "Someone"} played Wild Draw 4 and chose ${finalColor}`;
         } else if (card.color === "wild" && card.value === "wild") {
           this.data.message = `${user?.name || "Someone"} played Wild and chose ${finalColor}`;
@@ -236,21 +246,9 @@ const luno: Game<LunoSession> = {
           this.data.message = `${user?.name || "Someone"} played ${card.color} ${card.value}`;
         }
 
-        // Apply skip or draws
+        // Apply skip (only skips / 2-player reverse, not draw cards anymore)
         if (skipNext) {
           const nextPlayerIdx = (this.data.turnOf + this.data.direction + this.players.length) % this.players.length;
-          if (nextDraw > 0) {
-            const nextPlayerData = this.data.playersData[nextPlayerIdx];
-            if (nextPlayerData) {
-              for (let i = 0; i < nextDraw; i++) {
-                nextPlayerData.hand.push(getRandomCard());
-              }
-              this.data.drawPileCount = Math.max(0, this.data.drawPileCount - nextDraw);
-              if (this.data.drawPileCount <= 0) {
-                this.data.drawPileCount = 40;
-              }
-            }
-          }
           this.data.turnOf = nextPlayerIdx;
         }
 
@@ -268,15 +266,22 @@ const luno: Game<LunoSession> = {
 
         const playerData = this.data.playersData[this.data.turnOf];
         if (playerData) {
-          playerData.hand.push(getRandomCard());
-          this.data.drawPileCount = Math.max(0, this.data.drawPileCount - 1);
+          const drawCount = this.data.accumulatedDrawCount > 0 ? this.data.accumulatedDrawCount : 1;
+          for (let i = 0; i < drawCount; i++) {
+            playerData.hand.push(getRandomCard());
+          }
+          this.data.drawPileCount = Math.max(0, this.data.drawPileCount - drawCount);
           if (this.data.drawPileCount <= 0) {
             this.data.drawPileCount = 40;
           }
+          const user = getUserById(playerId);
+          if (this.data.accumulatedDrawCount > 0) {
+            this.data.message = `${user?.name || "Someone"} timed out and drew ${drawCount} cards`;
+            this.data.accumulatedDrawCount = 0;
+          } else {
+            this.data.message = `${user?.name || "Someone"} timed out and drew a card`;
+          }
         }
-
-        const user = getUserById(playerId);
-        this.data.message = `${user?.name || "Someone"} timed out and drew a card`;
 
         this.nextTurn();
         this.resetTimer();
@@ -338,6 +343,7 @@ const luno: Game<LunoSession> = {
       drawPileCount: 40,
       nextTimestamp: undefined,
       message: "Waiting for players...",
+      accumulatedDrawCount: 0,
     };
   },
 

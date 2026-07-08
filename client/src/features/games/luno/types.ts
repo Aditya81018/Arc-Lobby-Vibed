@@ -29,6 +29,7 @@ export interface LunoData {
 	drawPileCount: number;
 	nextTimestamp: number | undefined;
 	message: string;
+	accumulatedDrawCount: number;
 }
 
 export interface LunoSession extends GameSession {

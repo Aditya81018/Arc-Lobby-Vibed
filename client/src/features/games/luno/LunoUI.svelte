@@ -88,6 +88,9 @@
 
 	function isCardPlayable(card: { color: string; value: string }) {
 		if (!isPlayerTurn) return false;
+		if (session.data.accumulatedDrawCount && session.data.accumulatedDrawCount > 0) {
+			return card.value === 'draw-two' || card.value === 'wild-draw-four';
+		}
 		const topCard = session.data.discardPile[session.data.discardPile.length - 1];
 		if (!topCard) return true;
 		return card.color === 'wild' || card.color === topCard.color || card.value === topCard.value;
@@ -243,7 +246,11 @@
 					</div>
 					<!-- Label -->
 					<span class="mt-3 font-mono text-[9px] font-[700] tracking-wider text-white/50 uppercase">
-						Draw ({session.data.drawPileCount})
+						{#if session.data.accumulatedDrawCount > 0}
+							Draw +{session.data.accumulatedDrawCount} ({session.data.drawPileCount})
+						{:else}
+							Draw ({session.data.drawPileCount})
+						{/if}
 					</span>
 				</button>
 
@@ -253,7 +260,7 @@
 						e.stopPropagation();
 						handleDiscardPileClick();
 					}}
-					class="group absolute top-[44%] left-1/2 z-40 -translate-x-1/2 -translate-y-1/2 flex cursor-pointer flex-col items-center gap-2 border-0 bg-transparent transition-all duration-100 outline-none active:scale-95 pointer-events-auto"
+					class="group absolute max-md:bottom-108 md:bottom-1/2 left-1/2 z-40 -translate-x-1/2 flex cursor-pointer flex-col items-center gap-2 border-0 bg-transparent transition-all duration-100 outline-none active:scale-95 pointer-events-auto"
 					disabled={session.state === 'waiting'}
 					title={isMobile && selectedCardIndex !== null ? 'Discard selected card' : 'Discard pile'}
 				>
@@ -278,17 +285,13 @@
 							</div>
 						{/each}
 					</div>
-					<!-- Label -->
-					<span
-						class="mt-2 font-mono text-[10px] font-[700] tracking-wider text-white/50 uppercase"
-					>
-						Discard
-					</span>
 				</button>
 
 				<!-- Live Game Message Overlay -->
 				{#if session.state === 'ongoing'}
-					<div class="absolute top-[60%] text-center px-4 max-w-sm pointer-events-auto">
+					<div
+						class="absolute bottom-[18rem] md:bottom-[20rem] text-center px-4 max-w-sm pointer-events-auto"
+					>
 						<p class="text-sm font-semibold tracking-wide text-white/70">
 							{session.data.message}
 						</p>
