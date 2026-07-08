@@ -40,6 +40,24 @@
 	let isMobile = $state(false);
 	let activeAnimation = $state<'top' | 'left' | 'right' | 'bottom'>('bottom');
 
+	let showColorSelector = $state(false);
+	let pendingDiscardIdx = $state<number | null>(null);
+
+	$effect(() => {
+		// Reset selector when the active turn player changes
+		const _ = session.data.turnOf;
+		showColorSelector = false;
+		pendingDiscardIdx = null;
+	});
+
+	function selectColor(color: 'red' | 'blue' | 'yellow' | 'green') {
+		if (pendingDiscardIdx !== null) {
+			socket.emit('luno-discard-card', pendingDiscardIdx, color);
+		}
+		showColorSelector = false;
+		pendingDiscardIdx = null;
+	}
+
 	onMount(() => {
 		const mediaQuery = window.matchMedia('(pointer: coarse)');
 		isMobile = mediaQuery.matches;
@@ -72,15 +90,31 @@
 	function handleCardClick(card: { color: string; value: string }, idx: number) {
 		if (!isCardPlayable(card)) return;
 
-		if (!isMobile) {
-			socket.emit('luno-discard-card', idx);
-			selectedCardIndex = null;
+		if (card.color === 'wild') {
+			if (!isMobile) {
+				pendingDiscardIdx = idx;
+				showColorSelector = true;
+				selectedCardIndex = null;
+			} else {
+				if (selectedCardIndex === idx) {
+					pendingDiscardIdx = idx;
+					showColorSelector = true;
+					selectedCardIndex = null;
+				} else {
+					selectedCardIndex = idx;
+				}
+			}
 		} else {
-			if (selectedCardIndex === idx) {
+			if (!isMobile) {
 				socket.emit('luno-discard-card', idx);
 				selectedCardIndex = null;
 			} else {
-				selectedCardIndex = idx;
+				if (selectedCardIndex === idx) {
+					socket.emit('luno-discard-card', idx);
+					selectedCardIndex = null;
+				} else {
+					selectedCardIndex = idx;
+				}
 			}
 		}
 	}
@@ -95,8 +129,14 @@
 		if (isMobile && selectedCardIndex !== null) {
 			const card = hand[selectedCardIndex];
 			if (card && isCardPlayable(card)) {
-				socket.emit('luno-discard-card', selectedCardIndex);
-				selectedCardIndex = null;
+				if (card.color === 'wild') {
+					pendingDiscardIdx = selectedCardIndex;
+					showColorSelector = true;
+					selectedCardIndex = null;
+				} else {
+					socket.emit('luno-discard-card', selectedCardIndex);
+					selectedCardIndex = null;
+				}
 			}
 		}
 	}
@@ -311,6 +351,56 @@
 			{/if}
 		{/if}
 	</PlayersLayout>
+
+	<!-- Color Selector Overlay -->
+	{#if isPlayerTurn && showColorSelector}
+		<div
+			class="fixed inset-0 z-[1100] flex items-center justify-center bg-black/50 transition-opacity duration-300"
+		>
+			<div
+				class="flex flex-col items-center gap-4 p-4 rounded-xl bg-[#12162A] border border-[#232840] shadow-2xl max-w-[280px] w-full mx-4 text-center animate-scaleUp"
+			>
+				<div class="text-lg text-white font-bold">Pick a color</div>
+				<div class="grid grid-cols-2 gap-3 w-full">
+					<button
+						onclick={() => selectColor('red')}
+						class="flex items-center justify-center h-12 rounded-lg font-bold text-white transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-md shadow-black/25"
+						style="background-color: #FF5D8F;"
+						aria-label="Red"
+					>
+					</button>
+					<button
+						onclick={() => selectColor('blue')}
+						class="flex items-center justify-center h-12 rounded-lg font-bold text-white transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-md shadow-black/25"
+						style="background-color: #7C5CFC;"
+						aria-label="Blue"
+					></button>
+					<button
+						onclick={() => selectColor('yellow')}
+						class="flex items-center justify-center h-12 rounded-lg font-bold text-black transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-md shadow-black/25"
+						style="background-color: #F6C445;"
+						aria-label="Yellow"
+					></button>
+					<button
+						onclick={() => selectColor('green')}
+						class="flex items-center justify-center h-12 rounded-lg font-bold text-white transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-md shadow-black/25"
+						style="background-color: #57D08C;"
+						aria-label="Green"
+					></button>
+				</div>
+
+				<button
+					onclick={() => {
+						showColorSelector = false;
+						pendingDiscardIdx = null;
+					}}
+					class="btn btn-ghost btn-xs text-gray-500 hover:text-white"
+				>
+					Cancel
+				</button>
+			</div>
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -409,5 +499,19 @@
 			opacity: 1;
 			transform: translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(1);
 		}
+	}
+
+	@keyframes scaleUp {
+		from {
+			opacity: 0;
+			transform: scale(0.9);
+		}
+		to {
+			opacity: 1;
+			transform: scale(1);
+		}
+	}
+	.animate-scaleUp {
+		animation: scaleUp 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 	}
 </style>

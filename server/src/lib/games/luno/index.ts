@@ -42,7 +42,7 @@ interface LunoSession extends GameSession {
   data: LunoData;
   nextTurn: () => void;
   handleDrawCard: (playerId: string) => void;
-  handleDiscardCard: (playerId: string, cardIndex: number) => void;
+  handleDiscardCard: (playerId: string, cardIndex: number, chosenColor?: string) => void;
   onTimeRunOut: () => void;
   resetTimer: () => void;
 }
@@ -148,7 +148,7 @@ const luno: Game<LunoSession> = {
         io.to(this.id).emit("session-data-update", this.data);
       },
 
-      handleDiscardCard(playerId, cardIndex) {
+      handleDiscardCard(playerId, cardIndex, chosenColor?: string) {
         if (this.state !== "ongoing") return;
         const currentActivePlayer = this.players[this.data.turnOf];
         if (currentActivePlayer !== playerId) return;
@@ -166,6 +166,15 @@ const luno: Game<LunoSession> = {
         // Discard card from hand
         playerData.hand.splice(cardIndex, 1);
 
+        let finalColor = card.color;
+        if (card.color === "wild") {
+          if (chosenColor && ["red", "blue", "yellow", "green"].includes(chosenColor)) {
+            finalColor = chosenColor;
+          } else {
+            finalColor = ["red", "blue", "yellow", "green"][Math.floor(Math.random() * 4)];
+          }
+        }
+
         // Add to discard pile
         const rotate = Math.floor(Math.random() * 26) - 13;
         const x = Math.floor(Math.random() * 21) - 10;
@@ -173,7 +182,7 @@ const luno: Game<LunoSession> = {
         const zIndex = 10 + this.data.discardPile.length;
 
         this.data.discardPile.push({
-          color: card.color,
+          color: finalColor,
           value: card.value,
           id: `${card.color}-${card.value}-${Date.now()}-${Math.random()}`,
           rotate,
@@ -215,7 +224,9 @@ const luno: Game<LunoSession> = {
         } else if (card.value === "wild-draw-four") {
           skipNext = true;
           nextDraw = 4;
-          this.data.message = `${user?.name || "Someone"} played Wild Draw 4`;
+          this.data.message = `${user?.name || "Someone"} played Wild Draw 4 and chose ${finalColor}`;
+        } else if (card.color === "wild" && card.value === "wild") {
+          this.data.message = `${user?.name || "Someone"} played Wild and chose ${finalColor}`;
         } else {
           this.data.message = `${user?.name || "Someone"} played ${card.color} ${card.value}`;
         }
@@ -377,8 +388,8 @@ const luno: Game<LunoSession> = {
       session.handleDrawCard(socket.id);
     };
 
-    const onDiscardCard = (cardIndex: number) => {
-      session.handleDiscardCard(socket.id, cardIndex);
+    const onDiscardCard = (cardIndex: number, chosenColor?: string) => {
+      session.handleDiscardCard(socket.id, cardIndex, chosenColor);
     };
 
     socket.on("luno-draw-card", onDrawCard);

@@ -48,6 +48,17 @@
 	let isMobile = $state(false);
 	let activeAnimation = $state<'top' | 'left' | 'right' | 'bottom'>('bottom');
 
+	let showColorSelector = $state(false);
+	let pendingDiscardIdx = $state<number | null>(null);
+
+	function selectColor(color: 'red' | 'blue' | 'yellow' | 'green') {
+		if (pendingDiscardIdx !== null) {
+			discardCard(pendingDiscardIdx, color);
+		}
+		showColorSelector = false;
+		pendingDiscardIdx = null;
+	}
+
 	// Detect mobile screen / coarse pointer interaction and retrieve settings
 	onMount(() => {
 		const mediaQuery = window.matchMedia('(pointer: coarse)');
@@ -112,7 +123,7 @@
 		drawPileCount--;
 	}
 
-	function discardCard(idx: number) {
+	function discardCard(idx: number, chosenColor?: string) {
 		const card = hand[idx];
 		if (!card) return;
 
@@ -122,10 +133,19 @@
 		const y = Math.floor(Math.random() * 17) - 8; // -8px to 8px
 		const zIndex = 10 + discardPile.length;
 
+		let finalColor = card.color;
+		if (card.color === 'wild') {
+			if (chosenColor && ['red', 'blue', 'yellow', 'green'].includes(chosenColor)) {
+				finalColor = chosenColor;
+			} else {
+				finalColor = ['red', 'blue', 'yellow', 'green'][Math.floor(Math.random() * 4)];
+			}
+		}
+
 		discardPile = [
 			...discardPile,
 			{
-				color: card.color,
+				color: finalColor,
 				value: card.value,
 				id: `${card.color}-${card.value}-${Date.now()}-${Math.random()}`,
 				rotate,
@@ -140,20 +160,45 @@
 	}
 
 	function handleCardClick(card: Card, idx: number) {
-		if (!isMobile) {
-			discardCard(idx);
+		if (card.color === 'wild') {
+			if (!isMobile) {
+				pendingDiscardIdx = idx;
+				showColorSelector = true;
+				selectedCardIndex = null;
+			} else {
+				if (selectedCardIndex === idx) {
+					pendingDiscardIdx = idx;
+					showColorSelector = true;
+					selectedCardIndex = null;
+				} else {
+					selectedCardIndex = idx;
+				}
+			}
 		} else {
-			if (selectedCardIndex === idx) {
+			if (!isMobile) {
 				discardCard(idx);
 			} else {
-				selectedCardIndex = idx;
+				if (selectedCardIndex === idx) {
+					discardCard(idx);
+				} else {
+					selectedCardIndex = idx;
+				}
 			}
 		}
 	}
 
 	function handleDiscardPileClick() {
 		if (isMobile && selectedCardIndex !== null) {
-			discardCard(selectedCardIndex);
+			const card = hand[selectedCardIndex];
+			if (card) {
+				if (card.color === 'wild') {
+					pendingDiscardIdx = selectedCardIndex;
+					showColorSelector = true;
+					selectedCardIndex = null;
+				} else {
+					discardCard(selectedCardIndex);
+				}
+			}
 		}
 	}
 
@@ -275,6 +320,54 @@
 			</span>
 		</div>
 	</div>
+
+	<!-- Color Selector Overlay -->
+	{#if showColorSelector}
+		<div class="fixed inset-0 z-[1100] flex items-center justify-center bg-black/50 transition-opacity duration-300">
+			<div class="flex flex-col items-center gap-4 p-4 rounded-xl bg-[#12162A] border border-[#232840] shadow-2xl max-w-[280px] w-full mx-4 text-center animate-scaleUp">
+				<div class="grid grid-cols-2 gap-3 w-full">
+					<button
+						onclick={() => selectColor('red')}
+						class="flex items-center justify-center h-12 rounded-lg font-bold text-white transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-md shadow-black/25"
+						style="background-color: #FF5D8F;"
+					>
+						Red
+					</button>
+					<button
+						onclick={() => selectColor('blue')}
+						class="flex items-center justify-center h-12 rounded-lg font-bold text-white transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-md shadow-black/25"
+						style="background-color: #7C5CFC;"
+					>
+						Blue
+					</button>
+					<button
+						onclick={() => selectColor('yellow')}
+						class="flex items-center justify-center h-12 rounded-lg font-bold text-black transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-md shadow-black/25"
+						style="background-color: #F6C445;"
+					>
+						Yellow
+					</button>
+					<button
+						onclick={() => selectColor('green')}
+						class="flex items-center justify-center h-12 rounded-lg font-bold text-white transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-md shadow-black/25"
+						style="background-color: #57D08C;"
+					>
+						Green
+					</button>
+				</div>
+
+				<button
+					onclick={() => {
+						showColorSelector = false;
+						pendingDiscardIdx = null;
+					}}
+					class="btn btn-ghost btn-xs text-gray-500 hover:text-white"
+				>
+					Cancel
+				</button>
+			</div>
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -374,5 +467,19 @@
 			opacity: 1;
 			transform: translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(1);
 		}
+	}
+
+	@keyframes scaleUp {
+		from {
+			opacity: 0;
+			transform: scale(0.9);
+		}
+		to {
+			opacity: 1;
+			transform: scale(1);
+		}
+	}
+	.animate-scaleUp {
+		animation: scaleUp 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 	}
 </style>
