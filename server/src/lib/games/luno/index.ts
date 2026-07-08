@@ -20,6 +20,7 @@ interface DiscardedCard {
   x: number;
   y: number;
   zIndex: number;
+  playedBy?: string;
 }
 
 interface LunoPlayer {
@@ -179,6 +180,7 @@ const luno: Game<LunoSession> = {
           x,
           y,
           zIndex,
+          playedBy: playerId,
         });
 
         const user = getUserById(playerId);

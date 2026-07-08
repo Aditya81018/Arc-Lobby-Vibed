@@ -29,6 +29,7 @@
 		x: number;
 		y: number;
 		zIndex: number;
+		playedBy?: string;
 	}
 
 	let discardPile = $state<DiscardedCard[]>([
@@ -130,7 +131,8 @@
 				rotate,
 				x,
 				y,
-				zIndex
+				zIndex,
+				playedBy: $userData.id
 			}
 		];
 		hand = hand.filter((_, i) => i !== idx);

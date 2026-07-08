@@ -1,5 +1,10 @@
 <script lang="ts">
-	import { type UserData, userData as user } from '../../user/store';
+	import {
+		type UserData,
+		userData as user,
+		getUserForeground,
+		getUserBackground
+	} from '../../user/store';
 	import { socket } from '$lib/socket';
 	import type { LunoSession } from './types';
 	import PlayersLayout from './PlayersLayout.svelte';
@@ -99,6 +104,34 @@
 	function handleBackgroundClick() {
 		selectedCardIndex = null;
 	}
+
+	function getAnimationDirection(playedBy?: string): 'top' | 'left' | 'right' | 'bottom' {
+		if (!playedBy) return 'bottom';
+		const playedByIndex = session.players.indexOf(playedBy);
+		if (playedByIndex === -1) return 'bottom';
+
+		let selfIdx = session.players.indexOf($user.id);
+		selfIdx = selfIdx === -1 ? 0 : selfIdx;
+
+		const playersCount = session.players.length;
+		const relativePosition = (playedByIndex - selfIdx + playersCount) % playersCount;
+
+		if (playersCount === 2) {
+			if (relativePosition === 0) return 'bottom';
+			if (relativePosition === 1) return 'top';
+		} else if (playersCount === 3) {
+			if (relativePosition === 0) return 'bottom';
+			if (relativePosition === 1) return 'left';
+			if (relativePosition === 2) return 'right';
+		} else if (playersCount === 4) {
+			if (relativePosition === 0) return 'bottom';
+			if (relativePosition === 1) return 'left';
+			if (relativePosition === 2) return 'top';
+			if (relativePosition === 3) return 'right';
+		}
+
+		return 'bottom';
+	}
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -119,17 +152,13 @@
 					<BackToLobbyButton {session} />
 				</div>
 			</div>
-		{:else if session.state === 'waiting'}
-			<div class="flex flex-col items-center justify-center gap-4 opacity-50 z-50">
-				<div class="text-2xl font-bold text-white">Waiting for players to join...</div>
-				<div class="text-sm font-mono tracking-widest text-white/60">
-					({session.players.length}/{session.settings['players-count']})
-				</div>
-			</div>
 		{:else}
-			<!-- Active game session elements -->
+			<!-- Dimmed game screen elements when waiting -->
 			<div
-				class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none"
+				class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none {session.state ===
+				'waiting'
+					? 'opacity-25'
+					: ''}"
 			>
 				<!-- Draw Pile Component -->
 				<button
@@ -137,8 +166,10 @@
 						e.stopPropagation();
 						handleDrawPileClick();
 					}}
-					class="group absolute bottom-52 z-50 flex md:translate-x-44 cursor-pointer flex-col items-center gap-2 border-0 bg-transparent transition-all duration-100 outline-none active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 max-md:right-4 pointer-events-auto"
-					disabled={!isPlayerTurn || session.data.drawPileCount === 0}
+					class="group absolute bottom-52 z-1000 flex md:translate-x-44 cursor-pointer flex-col items-center gap-2 border-0 bg-transparent transition-all duration-100 outline-none active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 max-md:right-4 pointer-events-auto"
+					disabled={!isPlayerTurn ||
+						session.data.drawPileCount === 0 ||
+						session.state === 'waiting'}
 					title="Draw a card"
 				>
 					<div
@@ -175,12 +206,13 @@
 						handleDiscardPileClick();
 					}}
 					class="group absolute top-[44%] left-1/2 z-40 -translate-x-1/2 -translate-y-1/2 flex cursor-pointer flex-col items-center gap-2 border-0 bg-transparent transition-all duration-100 outline-none active:scale-95 pointer-events-auto"
+					disabled={session.state === 'waiting'}
 					title={isMobile && selectedCardIndex !== null ? 'Discard selected card' : 'Discard pile'}
 				>
 					<div class="relative h-[150px] w-[108px]">
 						{#each session.data.discardPile.slice(-4) as item (item.id)}
 							<div
-								class="absolute inset-0 discard-card-anim-{activeAnimation}"
+								class="absolute inset-0 discard-card-anim-{getAnimationDirection(item.playedBy)}"
 								style="
 									--rot: {item.rotate}deg;
 									--tx: {item.x}px;
@@ -207,35 +239,74 @@
 				</button>
 
 				<!-- Live Game Message Overlay -->
-				<div class="absolute top-[68%] text-center px-4 max-w-sm pointer-events-auto">
-					<p class="text-sm font-semibold tracking-wide text-white/70">
-						{session.data.message}
-					</p>
-					{#if isPlayerTurn}
-						<div
-							class="badge badge-success badge-sm mt-1.5 font-bold uppercase tracking-wider animate-bounce"
-						>
-							Your Turn!
-						</div>
-					{/if}
-				</div>
+				{#if session.state === 'ongoing'}
+					<div class="absolute top-[60%] text-center px-4 max-w-sm pointer-events-auto">
+						<p class="text-sm font-semibold tracking-wide text-white/70">
+							{session.data.message}
+						</p>
+						{#if isPlayerTurn}
+							<div
+								class="badge badge-success badge-sm mt-2 font-bold uppercase tracking-wider animate-bounce"
+							>
+								Your Turn!
+							</div>
+						{/if}
+					</div>
+				{/if}
 			</div>
 
-			<!-- Player's custom fan hand at the bottom -->
+			<!-- Player's custom fan hand and identity card at the bottom -->
 			{#if isPlayer}
 				<div
-					class="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-lg px-4 flex flex-col items-center select-none"
+					class="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-lg px-4 flex flex-col items-center gap-4 select-none {session.state ===
+					'waiting'
+						? 'opacity-25 pointer-events-none'
+						: ''}"
 					onclick={(e) => e.stopPropagation()}
 				>
 					<UnoHand
 						cards={hand}
 						cardSize="sm"
-						playable={isPlayerTurn}
+						playable={isPlayerTurn && session.state === 'ongoing'}
 						shadowDepth="retro"
 						{selectedCardIndex}
 						{isCardPlayable}
 						onclickCard={handleCardClick}
 					/>
+
+					<!-- User Identity Card -->
+					<div class="relative h-[120px] flex flex-col items-center justify-center p-3 py-4">
+						<!-- <div
+							class="mb-2 flex h-12 w-12 items-center justify-center rounded-full text-2xl shadow-inner bg-black/10"
+							style="background-color: {getUserBackground($user.color)};"
+						>
+							{$user.emoji}
+						</div>
+						<span
+							class="line-clamp-1 text-center font-sans text-xs font-semibold tracking-wider"
+							style="color: {getUserForeground($user.color)};"
+						>
+							{$user.name}
+						</span> -->
+						<!-- <span
+							class="mt-1 font-mono text-[10px] font-bold tracking-wider text-white/40 uppercase"
+						>
+							{hand.length} Cards
+						</span> -->
+					</div>
+				</div>
+			{/if}
+
+			{#if session.state === 'waiting'}
+				<div
+					class="flex flex-col items-center justify-center gap-1 z-50 pointer-events-none select-none"
+				>
+					<div class="text-2xl font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+						Waiting for players...
+					</div>
+					<div class="text-sm font-mono tracking-widest text-white/60">
+						({session.players.length}/{session.settings['players-count']})
+					</div>
 				</div>
 			{/if}
 		{/if}

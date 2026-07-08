@@ -98,12 +98,16 @@
 
 		<!-- Vertical translation to create a downward arch on both sides -->
 		{@const translateY = Math.abs(idx - mid) * archDepth}
+		{@const isPlayableCard = isCardPlayable ? isCardPlayable(card, idx) : true}
+		{@const pullBack = !playable || !isPlayableCard}
 
 		<div
 			class="absolute bottom-0 origin-bottom transition-all duration-300"
-			class:playable-wrapper={playable}
+			class:playable-wrapper={playable && isPlayableCard}
+			class:unplayable-wrapper={pullBack}
 			style="
-				transform: rotate({angle}deg) translate({translateX}px, {translateY}px);
+				transform: rotate({angle}deg) translate({translateX}px, {translateY +
+				(pullBack ? 10 : 0)}px) scale({pullBack ? 0.95 : 1});
 				z-index: {selectedCardIndex === idx ? 999 : 10 + idx};
 			"
 		>
@@ -111,7 +115,7 @@
 				color={card.color}
 				value={card.value}
 				size={cardSize}
-				playable={playable && (isCardPlayable ? isCardPlayable(card, idx) : true)}
+				playable={playable && isPlayableCard}
 				{shadowDepth}
 				selected={selectedCardIndex === idx}
 				onclick={() => onclickCard?.(card, idx)}
@@ -129,5 +133,8 @@
 	}
 	.playable-wrapper:hover {
 		z-index: 1000 !important;
+	}
+	.unplayable-wrapper {
+		filter: brightness(0.6);
 	}
 </style>

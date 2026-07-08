@@ -13,6 +13,7 @@ export interface DiscardedCard {
 	x: number;
 	y: number;
 	zIndex: number;
+	playedBy?: string;
 }
 
 export interface LunoPlayer {

@@ -279,7 +279,7 @@
 															<span>Game Ended</span>
 														</div>
 													{:else}
-														<div class="h-6 w-6 shrink-0">
+														<div class="scale-75">
 															<UserAvatar user={winner} />
 														</div>
 														<div class="truncate text-sm font-extrabold">
