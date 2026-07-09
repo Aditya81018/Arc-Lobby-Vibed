@@ -129,7 +129,7 @@
 					skipNext = true;
 					message = `${$user.name} played Reverse to get another turn`;
 				} else {
-					dir = (dir === 1 ? -1 : 1);
+					dir = dir === 1 ? -1 : 1;
 					message = `${$user.name} reversed direction`;
 				}
 			} else if (card.value === 'skip') {
@@ -484,7 +484,7 @@
 				<!-- Live Game Message Overlay -->
 				{#if session.state === 'ongoing'}
 					<div
-						class="absolute left-1/2 -translate-x-1/2 bottom-72 md:bottom-120 text-center px-4 max-w-sm pointer-events-auto"
+						class="absolute left-1/2 -translate-x-1/2 bottom-72 md:bottom-80 text-center px-4 max-w-sm pointer-events-auto"
 					>
 						<p class="text-sm font-semibold tracking-wide text-ink/70">
 							{session.data.message}
@@ -546,9 +546,7 @@
 				<div
 					class="flex flex-col items-center justify-center gap-1 z-50 pointer-events-none select-none"
 				>
-					<div class="text-2xl font-bold text-ink">
-						Waiting for players...
-					</div>
+					<div class="text-2xl font-bold text-ink">Waiting for players...</div>
 					<div class="text-sm font-mono tracking-widest text-ink/60">
 						({session.players.length}/{session.settings['players-count']})
 					</div>
