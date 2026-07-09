@@ -14,6 +14,8 @@
 	import UnoHand from '../../../components/UnoHand.svelte';
 	import UnoCard from '../../../components/UnoCard.svelte';
 	import { onMount } from 'svelte';
+	import { setOptimisticPlay } from './optimistic';
+	import { currentGameSessionStore } from '../../game-sessions/store';
 
 	const {
 		session,
@@ -56,9 +58,136 @@
 		pendingDiscardIdx = null;
 	});
 
+	function discardCardOptimistically(cardIndex: number, chosenColor?: string) {
+		const card = hand[cardIndex];
+		if (!card) return;
+
+		let finalColor = card.color;
+		if (card.color === 'wild') {
+			if (chosenColor) {
+				finalColor = chosenColor;
+			} else {
+				finalColor = 'red';
+			}
+		}
+
+		// 1. Generate optimistic card info
+		const optId = `opt-${card.color}-${card.value}-${Date.now()}-${Math.random()}`;
+		const rotate = Math.floor(Math.random() * 26) - 13;
+		const x = Math.floor(Math.random() * 21) - 10;
+		const y = Math.floor(Math.random() * 17) - 8;
+
+		const optimisticPlay = {
+			color: finalColor,
+			value: card.value,
+			id: optId,
+			rotate,
+			x,
+			y,
+			playedBy: $user.id
+		};
+
+		// 2. Set the optimistic play globally so layout can reconcile
+		setOptimisticPlay(optimisticPlay);
+
+		// 3. Emit the socket event
+		socket.emit('luno-discard-card', cardIndex, chosenColor);
+
+		// 4. Update the local store optimistically
+		currentGameSessionStore.update((curr) => {
+			if (!curr || curr.gameId !== 'luno') return curr;
+
+			// Deep/shallow copy LunoData
+			const lunoData = curr.data as any;
+			if (!lunoData || !lunoData.playersData) return curr;
+
+			const newPlayersData = lunoData.playersData.map((player: any, pIdx: number) => {
+				if (pIdx === selfIndex) {
+					const newHand = [...player.hand];
+					newHand.splice(cardIndex, 1);
+					return { ...player, hand: newHand };
+				}
+				return player;
+			});
+
+			const nextDiscardPile = [
+				...lunoData.discardPile,
+				{
+					...optimisticPlay,
+					zIndex: 10 + lunoData.discardPile.length
+				}
+			];
+
+			// Simulate turn logic
+			let dir = lunoData.direction;
+			let skipNext = false;
+			let accumulatedDrawCount = lunoData.accumulatedDrawCount || 0;
+			let message = lunoData.message;
+
+			if (card.value === 'reverse') {
+				if (curr.players.length === 2) {
+					skipNext = true;
+					message = `${$user.name} played Reverse to get another turn`;
+				} else {
+					dir = (dir === 1 ? -1 : 1);
+					message = `${$user.name} reversed direction`;
+				}
+			} else if (card.value === 'skip') {
+				skipNext = true;
+				message = `${$user.name} skipped the next player`;
+			} else if (card.value === 'draw-two') {
+				accumulatedDrawCount = (accumulatedDrawCount || 0) + 2;
+				message = `${$user.name} played Draw 2`;
+			} else if (card.value === 'wild-draw-four') {
+				accumulatedDrawCount = (accumulatedDrawCount || 0) + 4;
+				message = `${$user.name} played Wild Draw 4 and chose ${finalColor}`;
+			} else if (card.color === 'wild' && card.value === 'wild') {
+				message = `${$user.name} played Wild and chose ${finalColor}`;
+			} else {
+				message = `${$user.name} played ${card.color} ${card.value}`;
+			}
+
+			let tempTurnOf = lunoData.turnOf;
+			if (skipNext) {
+				tempTurnOf = (tempTurnOf + dir + curr.players.length) % curr.players.length;
+			}
+
+			let attempts = 0;
+			do {
+				tempTurnOf = (tempTurnOf + dir + curr.players.length) % curr.players.length;
+				attempts++;
+			} while (curr.players[tempTurnOf] === undefined && attempts < curr.players.length);
+
+			const nextTurnOf = tempTurnOf;
+
+			let nextState = curr.state;
+			let nextWinner = curr.winner;
+			if (newPlayersData[selfIndex].hand.length === 0) {
+				nextState = 'finished';
+				nextWinner = $user.id;
+				message = `${$user.name} has won!`;
+			}
+
+			return {
+				...curr,
+				state: nextState,
+				winner: nextWinner,
+				data: {
+					...lunoData,
+					turnOf: nextTurnOf,
+					direction: dir,
+					playersData: newPlayersData,
+					discardPile: nextDiscardPile,
+					message,
+					accumulatedDrawCount
+				}
+			};
+		});
+	}
+
 	function selectColor(color: 'red' | 'blue' | 'yellow' | 'green') {
 		if (pendingDiscardIdx !== null) {
-			socket.emit('luno-discard-card', pendingDiscardIdx, color);
+			discardCardOptimistically(pendingDiscardIdx, color);
 		}
 		showColorSelector = false;
 		pendingDiscardIdx = null;
@@ -115,11 +244,11 @@
 			}
 		} else {
 			if (!isMobile) {
-				socket.emit('luno-discard-card', idx);
+				discardCardOptimistically(idx);
 				selectedCardIndex = null;
 			} else {
 				if (selectedCardIndex === idx) {
-					socket.emit('luno-discard-card', idx);
+					discardCardOptimistically(idx);
 					selectedCardIndex = null;
 				} else {
 					selectedCardIndex = idx;
@@ -143,7 +272,7 @@
 					showColorSelector = true;
 					selectedCardIndex = null;
 				} else {
-					socket.emit('luno-discard-card', selectedCardIndex);
+					discardCardOptimistically(selectedCardIndex);
 					selectedCardIndex = null;
 				}
 			}

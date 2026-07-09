@@ -12,6 +12,7 @@
 	import { getGameSessionById, leaveGameSession } from '../../../features/game-sessions/controller';
 	import LoadingScreen from '../../../components/LoadingScreen.svelte';
 	import { getLocalMembers } from '../../../features/lobby/controllers';
+	import { getOptimisticPlay, setOptimisticPlay } from '../../../features/games/luno/optimistic';
 
 	const { children } = $props();
 	const lobbyId = page.params.lobbyId!;
@@ -30,6 +31,22 @@
 
 		async function handleSessionDataUpdate(newData: GameSession['data']) {
 			if (!$currentGameSessionStore) return;
+
+			if ($currentGameSessionStore.gameId === 'luno') {
+				const opt = getOptimisticPlay();
+				if (opt && newData && Array.isArray((newData as any).discardPile) && (newData as any).discardPile.length > 0) {
+					const lData = newData as any;
+					const topCard = lData.discardPile[lData.discardPile.length - 1];
+					if (topCard.color === opt.color && topCard.value === opt.value && topCard.playedBy === socket.id) {
+						topCard.id = opt.id;
+						topCard.rotate = opt.rotate;
+						topCard.x = opt.x;
+						topCard.y = opt.y;
+						setOptimisticPlay(null);
+					}
+				}
+			}
+
 			$currentGameSessionStore.data = newData;
 		}
 
