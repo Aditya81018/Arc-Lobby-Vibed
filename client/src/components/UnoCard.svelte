@@ -32,9 +32,9 @@
 			ovalWidth: '50px',
 			ovalHeight: '24px',
 			fontSizeCenter: '18px',
-			fontSizeCorner: '9px',
+			fontSizeCorner: '12px',
 			cornerOffset: '6px',
-			cornerIconSize: 8,
+			cornerIconSize: 11,
 			backOvalWidth: '46px',
 			backOvalHeight: '24px',
 			backFontSize: '11px',
@@ -51,9 +51,9 @@
 			ovalWidth: '68px',
 			ovalHeight: '32px',
 			fontSizeCenter: '24px',
-			fontSizeCorner: '12px',
+			fontSizeCorner: '16px',
 			cornerOffset: '8px', // Shifted inward to prevent clipping
-			cornerIconSize: 11,
+			cornerIconSize: 15,
 			backOvalWidth: '64px', // Reduced to fit within inner border
 			backOvalHeight: '32px',
 			backFontSize: '16px', // Scaled text to fit
@@ -70,9 +70,9 @@
 			ovalWidth: '108px',
 			ovalHeight: '50px',
 			fontSizeCenter: '44px',
-			fontSizeCorner: '18px',
+			fontSizeCorner: '24px',
 			cornerOffset: '12px', // Shifted inward to prevent clipping
-			cornerIconSize: 16,
+			cornerIconSize: 22,
 			backOvalWidth: '100px', // Reduced to fit within inner border
 			backOvalHeight: '50px',
 			backFontSize: '26px', // Scaled text to fit
@@ -89,9 +89,9 @@
 			ovalWidth: '136px',
 			ovalHeight: '64px',
 			fontSizeCenter: '48px',
-			fontSizeCorner: '22px',
+			fontSizeCorner: '30px',
 			cornerOffset: '16px', // Shifted inward to prevent clipping
-			cornerIconSize: 20,
+			cornerIconSize: 27,
 			backOvalWidth: '128px', // Reduced to fit within inner border
 			backOvalHeight: '60px',
 			backFontSize: '32px', // Scaled text to fit
@@ -108,9 +108,9 @@
 			ovalWidth: '176px',
 			ovalHeight: '82px',
 			fontSizeCenter: '72px',
-			fontSizeCorner: '28px',
+			fontSizeCorner: '38px',
 			cornerOffset: '20px', // Shifted inward to prevent clipping
-			cornerIconSize: 26,
+			cornerIconSize: 35,
 			backOvalWidth: '160px', // Reduced to fit within inner border
 			backOvalHeight: '74px',
 			backFontSize: '42px', // Scaled text to fit
