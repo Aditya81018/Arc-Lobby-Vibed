@@ -55,34 +55,39 @@ interface LunoPrivateData {
 const privateData = new Map<string, LunoPrivateData>();
 
 function getRandomCard(): Card {
-  const colors = ["red", "blue", "yellow", "green", "wild"];
-  const values = [
-    "0",
-    "1",
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
-    "7",
-    "8",
-    "9",
-    "skip",
-    "reverse",
-    "draw-two",
-    "wild-draw-four",
-  ];
+  // Total cards in UNO deck: 112
+  // - 4 colors (red, blue, yellow, green), each color has 2 sets of:
+  //   - numbers 0 to 9
+  //   - skip, reverse, draw-two
+  //   Total colored cards: 4 * 2 * 13 = 104 cards
+  // - 4 wild, 4 wild-draw-four
+  //   Total wild cards: 8 cards
+  // Total deck size = 112 cards
 
-  const randomColor = colors[Math.floor(Math.random() * colors.length)];
-  let randomValue = "";
+  const randomIndex = Math.floor(Math.random() * 112);
 
-  if (randomColor === "wild") {
-    randomValue = Math.random() > 0.5 ? "wild" : "wild-draw-four";
+  if (randomIndex < 104) {
+    const colors = ["red", "blue", "yellow", "green"];
+    const colorIndex = Math.floor(randomIndex / 26);
+    const cardInColorIndex = randomIndex % 26;
+
+    const values = [
+      "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+      "skip", "reverse", "draw-two"
+    ];
+    const valueIndex = Math.floor(cardInColorIndex / 2);
+
+    return {
+      color: colors[colorIndex],
+      value: values[valueIndex],
+    };
   } else {
-    const standardValues = values.filter((v) => v !== "wild" && v !== "wild-draw-four");
-    randomValue = standardValues[Math.floor(Math.random() * standardValues.length)];
+    const wildIndex = randomIndex - 104;
+    return {
+      color: "wild",
+      value: wildIndex < 4 ? "wild" : "wild-draw-four",
+    };
   }
-  return { color: randomColor, value: randomValue };
 }
 
 const luno: Game<LunoSession> = {
@@ -137,10 +142,7 @@ const luno: Game<LunoSession> = {
         for (let i = 0; i < drawCount; i++) {
           playerData.hand.push(getRandomCard());
         }
-        this.data.drawPileCount = Math.max(0, this.data.drawPileCount - drawCount);
-        if (this.data.drawPileCount <= 0) {
-          this.data.drawPileCount = 40;
-        }
+        // Draw pile is infinite, keep count constant
 
         const user = getUserById(playerId);
         if (this.data.accumulatedDrawCount > 0) {
@@ -224,7 +226,8 @@ const luno: Game<LunoSession> = {
         let skipNext = false;
 
         if (card.value === "reverse") {
-          if (this.players.length === 2) {
+          const activePlayers = this.players.filter((p) => p !== undefined);
+          if (activePlayers.length === 2) {
             skipNext = true;
             this.data.message = `${user?.name || "Someone"} played Reverse to get another turn`;
           } else {
@@ -248,8 +251,13 @@ const luno: Game<LunoSession> = {
 
         // Apply skip (only skips / 2-player reverse, not draw cards anymore)
         if (skipNext) {
-          const nextPlayerIdx = (this.data.turnOf + this.data.direction + this.players.length) % this.players.length;
-          this.data.turnOf = nextPlayerIdx;
+          let skipIndex = this.data.turnOf;
+          let attempts = 0;
+          do {
+            skipIndex = (skipIndex + this.data.direction + this.players.length) % this.players.length;
+            attempts++;
+          } while (this.players[skipIndex] === undefined && attempts < this.players.length);
+          this.data.turnOf = skipIndex;
         }
 
         this.nextTurn();
@@ -270,10 +278,7 @@ const luno: Game<LunoSession> = {
           for (let i = 0; i < drawCount; i++) {
             playerData.hand.push(getRandomCard());
           }
-          this.data.drawPileCount = Math.max(0, this.data.drawPileCount - drawCount);
-          if (this.data.drawPileCount <= 0) {
-            this.data.drawPileCount = 40;
-          }
+          // Draw pile is infinite, keep count constant
           const user = getUserById(playerId);
           if (this.data.accumulatedDrawCount > 0) {
             this.data.message = `${user?.name || "Someone"} timed out and drew ${drawCount} cards`;
@@ -340,7 +345,7 @@ const luno: Game<LunoSession> = {
           zIndex: 10,
         },
       ],
-      drawPileCount: 40,
+      drawPileCount: 99,
       nextTimestamp: undefined,
       message: "Waiting for players...",
       accumulatedDrawCount: 0,

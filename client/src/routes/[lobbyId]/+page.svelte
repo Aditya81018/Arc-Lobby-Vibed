@@ -38,17 +38,40 @@
 
 	let copied = $state(false);
 	function copyLobbyLink() {
-		navigator.clipboard.writeText(window.location.href);
-		copied = true;
-		setTimeout(() => {
-			copied = false;
-		}, 2000);
+		if (navigator.clipboard && navigator.clipboard.writeText) {
+			navigator.clipboard.writeText(window.location.href);
+			copied = true;
+			setTimeout(() => {
+				copied = false;
+			}, 2000);
+		} else {
+			try {
+				const textArea = document.createElement('textarea');
+				textArea.value = window.location.href;
+				textArea.style.top = '0';
+				textArea.style.left = '0';
+				textArea.style.position = 'fixed';
+				document.body.appendChild(textArea);
+				textArea.focus();
+				textArea.select();
+				const successful = document.execCommand('copy');
+				document.body.removeChild(textArea);
+				if (successful) {
+					copied = true;
+					setTimeout(() => {
+						copied = false;
+					}, 2000);
+				}
+			} catch (err) {
+				console.error('Fallback copy failed', err);
+			}
+		}
 	}
 
 	function handleSendTextMessage() {
 		if (message.trim() === '') return;
 
-		sendTextMessage(lobbyId, socket.id!, message);
+		sendTextMessage(lobbyId, $userData.id, message);
 		message = '';
 	}
 
@@ -81,7 +104,7 @@
 		if (!messages?.length) return;
 
 		const lastMessage = messages[messages.length - 1];
-		const isMe = lastMessage.senderId === socket.id;
+		const isMe = lastMessage.senderId === $userData.id;
 
 		// Always scroll if I sent it
 		if (isMe) {
@@ -153,7 +176,7 @@
 				class="custom-scrollbar relative flex-1 space-y-4 overflow-y-auto bg-canvas/45 p-4"
 			>
 				{#each $lobbyMessagesStore as msg, i (i)}
-					{@const isMe = msg.senderId === socket.id}
+					{@const isMe = msg.senderId === $userData.id}
 					{@const memberData = getMemberFromId(msg.senderId)}
 					<div class="chat {isMe ? 'chat-end' : 'chat-start'} gap-1">
 						<div

@@ -2,6 +2,7 @@ import { writable } from 'svelte/store';
 import request from '$lib/request';
 import { getRandomColor, getRandomEmoji, getRandomName } from './controllers';
 import { themeState } from '$lib/theme.svelte';
+import { uuid } from '$lib/helpers';
 
 export interface UserData {
 	id: string;
@@ -57,7 +58,7 @@ function getInitialData() {
 		name: getRandomName(),
 		emoji: getRandomEmoji(),
 		...data,
-		id: data.id || crypto.randomUUID(),
+		id: data.id || uuid(),
 		color
 	} as UserData;
 }

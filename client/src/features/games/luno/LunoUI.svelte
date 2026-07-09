@@ -125,7 +125,8 @@
 			let message = lunoData.message;
 
 			if (card.value === 'reverse') {
-				if (curr.players.length === 2) {
+				const activePlayers = curr.players.filter((p) => p !== undefined);
+				if (activePlayers.length === 2) {
 					skipNext = true;
 					message = `${$user.name} played Reverse to get another turn`;
 				} else {
@@ -149,7 +150,13 @@
 
 			let tempTurnOf = lunoData.turnOf;
 			if (skipNext) {
-				tempTurnOf = (tempTurnOf + dir + curr.players.length) % curr.players.length;
+				let skipIndex = tempTurnOf;
+				let attempts = 0;
+				do {
+					skipIndex = (skipIndex + dir + curr.players.length) % curr.players.length;
+					attempts++;
+				} while (curr.players[skipIndex] === undefined && attempts < curr.players.length);
+				tempTurnOf = skipIndex;
 			}
 
 			let attempts = 0;
@@ -441,9 +448,9 @@
 					<!-- Label -->
 					<span class="mt-3 font-mono text-[9px] font-[700] tracking-wider text-ink/50 uppercase">
 						{#if session.data.accumulatedDrawCount > 0}
-							Draw +{session.data.accumulatedDrawCount} ({session.data.drawPileCount})
+							Draw +{session.data.accumulatedDrawCount}
 						{:else}
-							Draw ({session.data.drawPileCount})
+							Draw
 						{/if}
 					</span>
 				</button>

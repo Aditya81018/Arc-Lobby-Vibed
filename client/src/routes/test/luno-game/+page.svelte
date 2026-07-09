@@ -88,39 +88,36 @@
 		localStorage.setItem('luno_discard_anim', type);
 	}
 
-	function drawRandomCard() {
-		if (drawPileCount <= 0) return;
+	function getRandomCard(): Card {
+		// Total cards in UNO deck: 112
+		const randomIndex = Math.floor(Math.random() * 112);
 
-		const colors = ['red', 'blue', 'yellow', 'green', 'wild'];
-		const values = [
-			'0',
-			'1',
-			'2',
-			'3',
-			'4',
-			'5',
-			'6',
-			'7',
-			'8',
-			'9',
-			'skip',
-			'reverse',
-			'draw-two',
-			'wild-draw-four'
-		];
+		if (randomIndex < 104) {
+			const colors = ["red", "blue", "yellow", "green"];
+			const colorIndex = Math.floor(randomIndex / 26);
+			const cardInColorIndex = randomIndex % 26;
 
-		const randomColor = colors[Math.floor(Math.random() * colors.length)];
-		let randomValue = '';
+			const values = [
+				"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+				"skip", "reverse", "draw-two"
+			];
+			const valueIndex = Math.floor(cardInColorIndex / 2);
 
-		if (randomColor === 'wild') {
-			randomValue = Math.random() > 0.5 ? 'wild' : 'wild-draw-four';
+			return {
+				color: colors[colorIndex],
+				value: values[valueIndex],
+			};
 		} else {
-			const standardValues = values.filter((v) => v !== 'wild' && v !== 'wild-draw-four');
-			randomValue = standardValues[Math.floor(Math.random() * standardValues.length)];
+			const wildIndex = randomIndex - 104;
+			return {
+				color: "wild",
+				value: wildIndex < 4 ? "wild" : "wild-draw-four",
+			};
 		}
+	}
 
-		hand = [...hand, { color: randomColor, value: randomValue }];
-		drawPileCount--;
+	function drawRandomCard() {
+		hand = [...hand, getRandomCard()];
 	}
 
 	function discardCard(idx: number, chosenColor?: string) {
@@ -220,7 +217,6 @@
 			drawRandomCard();
 		}}
 		class="group absolute bottom-68 z-50 flex md:translate-x-40 cursor-pointer flex-col items-center gap-2 border-0 bg-transparent transition-all duration-100 outline-none active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 max-md:right-4"
-		disabled={drawPileCount === 0}
 		title="Draw a random card"
 	>
 		<div
@@ -240,7 +236,7 @@
 		</div>
 		<!-- Label -->
 		<span class="mt-1 font-mono text-[10px] font-[700] tracking-wider text-white/50 uppercase">
-			Draw Pile ({drawPileCount})
+			Draw Pile (∞)
 		</span>
 	</button>
 

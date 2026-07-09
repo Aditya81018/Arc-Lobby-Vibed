@@ -1,9 +1,7 @@
 import request from '$lib/request';
-// import { get } from 'svelte/store';
-// import { userData } from '../user/store';
 import { lobbyStore, membersStore, type Lobby } from './store';
 import { socket } from '$lib/socket';
-import type { UserData } from '../user/store';
+import { userData, type UserData } from '../user/store';
 import { get } from 'svelte/store';
 
 export async function createLobby() {
@@ -19,7 +17,7 @@ export async function getLobbyById(lobbyId: string) {
 export async function joinLobby(lobbyId: string) {
 	const lobby = await request<Lobby | null>(`/lobbies/${lobbyId}`);
 	if (lobby) {
-		lobby.members.push(socket.id!);
+		lobby.members.push(get(userData).id);
 		lobbyStore.set(lobby);
 		socket.emit('join-lobby', lobbyId);
 		return true;
