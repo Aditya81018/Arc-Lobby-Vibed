@@ -91,7 +91,12 @@
 		setOptimisticPlay(optimisticPlay);
 
 		// 3. Emit the socket event
-		socket.emit('luno-discard-card', cardIndex, chosenColor);
+		socket.emit('luno-discard-card', cardIndex, chosenColor, {
+			id: optId,
+			rotate,
+			x,
+			y
+		});
 
 		// 4. Update the local store optimistically
 		currentGameSessionStore.update((curr) => {

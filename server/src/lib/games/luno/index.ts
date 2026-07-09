@@ -43,7 +43,12 @@ interface LunoSession extends GameSession {
   data: LunoData;
   nextTurn: () => void;
   handleDrawCard: (playerId: string) => void;
-  handleDiscardCard: (playerId: string, cardIndex: number, chosenColor?: string) => void;
+  handleDiscardCard: (
+    playerId: string,
+    cardIndex: number,
+    chosenColor?: string,
+    clientDetails?: { id: string; rotate: number; x: number; y: number }
+  ) => void;
   onTimeRunOut: () => void;
   resetTimer: () => void;
 }
@@ -158,7 +163,12 @@ const luno: Game<LunoSession> = {
         io.to(this.id).emit("session-data-update", this.data);
       },
 
-      handleDiscardCard(playerId, cardIndex, chosenColor?: string) {
+      handleDiscardCard(
+        playerId,
+        cardIndex,
+        chosenColor?: string,
+        clientDetails?: { id: string; rotate: number; x: number; y: number }
+      ) {
         if (this.state !== "ongoing") return;
         const currentActivePlayer = this.players[this.data.turnOf];
         if (currentActivePlayer !== playerId) return;
@@ -191,15 +201,15 @@ const luno: Game<LunoSession> = {
         }
 
         // Add to discard pile
-        const rotate = Math.floor(Math.random() * 26) - 13;
-        const x = Math.floor(Math.random() * 21) - 10;
-        const y = Math.floor(Math.random() * 17) - 8;
+        const rotate = clientDetails?.rotate ?? Math.floor(Math.random() * 26) - 13;
+        const x = clientDetails?.x ?? Math.floor(Math.random() * 21) - 10;
+        const y = clientDetails?.y ?? Math.floor(Math.random() * 17) - 8;
         const zIndex = 10 + this.data.discardPile.length;
 
         this.data.discardPile.push({
           color: finalColor,
           value: card.value,
-          id: `${card.color}-${card.value}-${Date.now()}-${Math.random()}`,
+          id: clientDetails?.id ?? `${card.color}-${card.value}-${Date.now()}-${Math.random()}`,
           rotate,
           x,
           y,
@@ -405,8 +415,12 @@ const luno: Game<LunoSession> = {
       session.handleDrawCard(socket.data.userId || socket.id);
     };
 
-    const onDiscardCard = (cardIndex: number, chosenColor?: string) => {
-      session.handleDiscardCard(socket.data.userId || socket.id, cardIndex, chosenColor);
+    const onDiscardCard = (
+      cardIndex: number,
+      chosenColor?: string,
+      clientDetails?: { id: string; rotate: number; x: number; y: number }
+    ) => {
+      session.handleDiscardCard(socket.data.userId || socket.id, cardIndex, chosenColor, clientDetails);
     };
 
     socket.on("luno-draw-card", onDrawCard);

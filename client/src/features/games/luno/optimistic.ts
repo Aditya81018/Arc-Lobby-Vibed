@@ -5,6 +5,7 @@ export interface OptimisticPlay {
 	rotate: number;
 	x: number;
 	y: number;
+	playedBy?: string;
 }
 
 let pendingOptimisticPlay: OptimisticPlay | null = null;
