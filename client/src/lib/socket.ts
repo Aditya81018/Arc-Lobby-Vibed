@@ -10,6 +10,3 @@ export const socket = io(PUBLIC_SERVER_URL, {
 	}
 });
 
-socket.on('connect', () => {
-	userData.set({ ...get(userData), id: socket.id! });
-});

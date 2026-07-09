@@ -31,10 +31,14 @@
 			const existingSession = $gameSessionsStore[gameSession.id];
 			if (existingSession) {
 				$gameSessionsStore[gameSession.id] = gameSession;
-				if ($session && $session.id === existingSession.id) {
-					$session = gameSession;
-				}
 			}
+			if ($session && $session.id === gameSession.id) {
+				$session = gameSession;
+			}
+		}
+
+		function handleSocketConnect() {
+			socket.emit('join-lobby', lobbyId);
 		}
 
 		handle();
@@ -47,6 +51,7 @@
 			$membersStore = await getMembersData(lobbyId);
 			socket.on('member-update', handleMemberUpdate);
 			socket.on('game-session-update', handleGameSessionUpdate);
+			socket.on('connect', handleSocketConnect);
 			isLoading = false;
 		}
 
@@ -54,6 +59,7 @@
 			leaveLobby(lobbyId);
 			socket.off('member-update', handleMemberUpdate);
 			socket.off('game-session-update', handleGameSessionUpdate);
+			socket.off('connect', handleSocketConnect);
 		};
 	});
 </script>

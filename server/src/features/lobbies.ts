@@ -89,7 +89,8 @@ export function getLobbyMembersData(lobbyId: string) {
 
 export function initLobbySockets(socket: Socket) {
   socket.on("join-lobby", (lobbyId) => {
-    joinLobby(lobbyId, socket.id);
+    const userId = socket.data.userId || socket.id;
+    joinLobby(lobbyId, userId);
     socket.join(lobbyId);
 
     const lobby = getLobbyById(lobbyId);
@@ -97,7 +98,8 @@ export function initLobbySockets(socket: Socket) {
   });
 
   socket.on("leave-lobby", (lobbyId) => {
-    leaveLobby(lobbyId, socket.id);
+    const userId = socket.data.userId || socket.id;
+    leaveLobby(lobbyId, userId);
     socket.leave(lobbyId);
 
     const lobby = getLobbyById(lobbyId);

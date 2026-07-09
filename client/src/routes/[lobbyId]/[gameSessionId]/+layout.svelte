@@ -13,6 +13,7 @@
 	import LoadingScreen from '../../../components/LoadingScreen.svelte';
 	import { getLocalMembers } from '../../../features/lobby/controllers';
 	import { getOptimisticPlay, setOptimisticPlay } from '../../../features/games/luno/optimistic';
+	import { userData } from '../../../features/user/store';
 
 	const { children } = $props();
 	const lobbyId = page.params.lobbyId!;
@@ -37,7 +38,7 @@
 				if (opt && newData && Array.isArray((newData as any).discardPile) && (newData as any).discardPile.length > 0) {
 					const lData = newData as any;
 					const topCard = lData.discardPile[lData.discardPile.length - 1];
-					if (topCard.color === opt.color && topCard.value === opt.value && topCard.playedBy === socket.id) {
+					if (topCard.color === opt.color && topCard.value === opt.value && topCard.playedBy === $userData.id) {
 						topCard.id = opt.id;
 						topCard.rotate = opt.rotate;
 						topCard.x = opt.x;
@@ -48,6 +49,16 @@
 			}
 
 			$currentGameSessionStore.data = newData;
+		}
+
+		function handleSessionUpdate(updatedSession: GameSession) {
+			if (!$currentGameSessionStore) return;
+			$currentGameSessionStore = updatedSession;
+			$currentGameSessionPlayersStore = getLocalMembers(updatedSession.players);
+		}
+
+		function handleSocketConnect() {
+			socket.emit('join-game-session', gameSessionId);
 		}
 
 		handle();
@@ -64,6 +75,8 @@
 				socket.emit('join-game-session', gameSessionId);
 				socket.on('players-update', handlePlayersUpdate);
 				socket.on('session-data-update', handleSessionDataUpdate);
+				socket.on('session-update', handleSessionUpdate);
+				socket.on('connect', handleSocketConnect);
 
 				isLoading = false;
 			} catch {
@@ -79,6 +92,8 @@
 			socket.emit('leave-game-session', gameSessionId);
 			socket.off('players-update', handlePlayersUpdate);
 			socket.off('session-data-update', handleSessionDataUpdate);
+			socket.off('session-update', handleSessionUpdate);
+			socket.off('connect', handleSocketConnect);
 		};
 	});
 </script>

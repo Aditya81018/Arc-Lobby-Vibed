@@ -54,17 +54,17 @@ function getInitialData() {
 	}
 
 	return {
-		id: '',
 		name: getRandomName(),
 		emoji: getRandomEmoji(),
 		...data,
+		id: data.id || crypto.randomUUID(),
 		color
 	} as UserData;
 }
 
 userData.subscribe((data) => {
 	try {
-		localStorage.setItem('user-data', JSON.stringify({ ...data, id: '' }));
+		localStorage.setItem('user-data', JSON.stringify(data));
 	} catch (e) {
 		console.error('Failed to write user-data to localStorage:', e);
 	}

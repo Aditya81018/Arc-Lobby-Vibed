@@ -180,6 +180,7 @@ gameSessionsRouter.post("/:id/join", (req, res) => {
   }
   const session = getGameSessionById(gameSessionId)!;
   io.to(session.id).emit("players-update", session.players);
+  io.to(session.id).emit("session-update", session);
 
   GAMES[session.gameId]?.onPlayerJoin(session, playerId);
 
@@ -191,6 +192,7 @@ gameSessionsRouter.post("/:id/leave", (req, res) => {
   const session = removePlayerFromSession(req.params.id, playerId)!;
   if (!session) return;
   io.to(session.id).emit("players-update", session.players);
+  io.to(session.id).emit("session-update", session);
   res.json(session);
 });
 

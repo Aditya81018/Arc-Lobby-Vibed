@@ -385,6 +385,7 @@ const luno: Game<LunoSession> = {
       session.state = "finished";
       session.winner = activePlayers[0] || undefined;
       io.to(session.lobbyId).emit("game-session-update", session);
+      io.to(session.id).emit("session-update", session);
     }
   },
 
@@ -396,11 +397,11 @@ const luno: Game<LunoSession> = {
 
   initSockets(session: LunoSession, socket: Socket): () => void {
     const onDrawCard = () => {
-      session.handleDrawCard(socket.id);
+      session.handleDrawCard(socket.data.userId || socket.id);
     };
 
     const onDiscardCard = (cardIndex: number, chosenColor?: string) => {
-      session.handleDiscardCard(socket.id, cardIndex, chosenColor);
+      session.handleDiscardCard(socket.data.userId || socket.id, cardIndex, chosenColor);
     };
 
     socket.on("luno-draw-card", onDrawCard);
