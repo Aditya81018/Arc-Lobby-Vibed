@@ -13,6 +13,7 @@
 	import LoadingScreen from '../../../components/LoadingScreen.svelte';
 	import { getLocalMembers } from '../../../features/lobby/controllers';
 	import { getOptimisticPlay, setOptimisticPlay } from '../../../features/games/luno/optimistic';
+	import { getOptimisticMove, setOptimisticMove } from '../../../features/games/tic-tac-toe/optimistic';
 	import { userData } from '../../../features/user/store';
 
 	const { children } = $props();
@@ -44,6 +45,18 @@
 						topCard.x = opt.x;
 						topCard.y = opt.y;
 						setOptimisticPlay(null);
+					}
+				}
+			} else if ($currentGameSessionStore.gameId === 'tic-tac-toe') {
+				const opt = getOptimisticMove();
+				if (opt && newData) {
+					const tData = newData as any;
+					const selfIndex = $currentGameSessionStore.players.indexOf($userData.id);
+					if (selfIndex !== -1 && tData.playersData && tData.playersData[selfIndex]) {
+						const playerMoves = tData.playersData[selfIndex].moves;
+						if (playerMoves.includes(opt.position)) {
+							setOptimisticMove(null);
+						}
 					}
 				}
 			}

@@ -4,6 +4,8 @@
 	import Token from './Token.svelte';
 	import type { TicTacToePlayer, TicTacToeSession } from './types';
 	import WinningStroke from './WinningStroke.svelte';
+	import { currentGameSessionStore } from '../../game-sessions/store';
+	import { setOptimisticMove } from './optimistic';
 
 	const {
 		session,
@@ -23,9 +25,80 @@
 		return () => {
 			if (
 				session.state === 'ongoing' &&
-				session.data.turnOf === session.players.indexOf($userData.id)
-			)
+				session.data.turnOf === session.players.indexOf($userData.id) &&
+				!occupiedBy(position)
+			) {
+				// 1. Set optimistic move
+				setOptimisticMove({ position });
+
+				// 2. Emit socket event
 				socket.emit('place-token', position);
+
+				// 3. Update local store
+				currentGameSessionStore.update((curr) => {
+					if (!curr || curr.gameId !== 'tic-tac-toe') return curr;
+
+					const tttData = curr.data as any;
+					if (!tttData || !tttData.playersData) return curr;
+
+					const selfIndex = curr.players.indexOf($userData.id);
+					if (selfIndex === -1 || tttData.turnOf !== selfIndex) return curr;
+
+					const newPlayersData = tttData.playersData.map((player: any) => {
+						if (player.id === selfIndex) {
+							const newMoves = [...player.moves];
+							if (!newMoves.includes(position)) {
+								newMoves.push(position);
+							}
+							if (curr.settings['is-moving'] && newMoves.length > 3) {
+								newMoves.splice(0, 1);
+							}
+							return { ...player, moves: newMoves };
+						}
+						return player;
+					});
+
+					const findWinningCombo = (moves: number[]) => {
+						const WIN_COMBOS = ['012', '345', '678', '036', '147', '258', '048', '246'];
+						const movesStr = moves.join();
+						for (const combo of WIN_COMBOS) {
+							if (
+								movesStr.includes(combo[0]) &&
+								movesStr.includes(combo[1]) &&
+								movesStr.includes(combo[2])
+							)
+								return WIN_COMBOS.indexOf(combo);
+						}
+						return undefined;
+					};
+
+					const winningCombo = findWinningCombo(newPlayersData[selfIndex].moves);
+					let nextState = curr.state;
+					let nextWinner = curr.winner;
+
+					if (winningCombo !== undefined) {
+						nextState = 'finished';
+						nextWinner = curr.players[selfIndex];
+					} else if (newPlayersData[0].moves.length + newPlayersData[1].moves.length === 9) {
+						nextState = 'finished';
+						nextWinner = 'draw';
+					}
+
+					const nextTurnOf = nextState === 'ongoing' ? (selfIndex === 0 ? 1 : 0) : tttData.turnOf;
+
+					return {
+						...curr,
+						state: nextState,
+						winner: nextWinner,
+						data: {
+							...tttData,
+							turnOf: nextTurnOf,
+							playersData: newPlayersData,
+							winningCombo
+						}
+					};
+				});
+			}
 		};
 	}
 </script>
