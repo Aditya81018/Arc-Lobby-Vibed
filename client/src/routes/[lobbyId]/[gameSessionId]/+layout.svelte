@@ -5,13 +5,11 @@
 	import { onMount } from 'svelte';
 	import { socket } from '$lib/socket';
 	import {
-		currentGameSessionPlayersStore,
 		currentGameSessionStore,
 		type GameSession
 	} from '../../../features/game-sessions/store';
 	import { getGameSessionById, leaveGameSession } from '../../../features/game-sessions/controller';
 	import LoadingScreen from '../../../components/LoadingScreen.svelte';
-	import { getLocalMembers } from '../../../features/lobby/controllers';
 	import { getOptimisticPlay, setOptimisticPlay } from '../../../features/games/luno/optimistic';
 	import { getOptimisticMove, setOptimisticMove } from '../../../features/games/tic-tac-toe/optimistic';
 	import { userData } from '../../../features/user/store';
@@ -23,12 +21,10 @@
 
 	onMount(() => {
 		async function handlePlayersUpdate(players: string[]) {
-			if (!$currentGameSessionStore) {
-				$currentGameSessionPlayersStore = null;
-				return;
-			}
-			$currentGameSessionStore.players = players;
-			$currentGameSessionPlayersStore = getLocalMembers(players);
+			currentGameSessionStore.update((curr) => {
+				if (!curr) return null;
+				return { ...curr, players };
+			});
 		}
 
 		async function handleSessionDataUpdate(newData: GameSession['data']) {
@@ -65,9 +61,7 @@
 		}
 
 		function handleSessionUpdate(updatedSession: GameSession) {
-			if (!$currentGameSessionStore) return;
 			$currentGameSessionStore = updatedSession;
-			$currentGameSessionPlayersStore = getLocalMembers(updatedSession.players);
 		}
 
 		function handleSocketConnect() {
@@ -83,7 +77,6 @@
 				}
 
 				$currentGameSessionStore = gameSession;
-				$currentGameSessionPlayersStore = await getLocalMembers(gameSession.players);
 
 				socket.emit('join-game-session', gameSessionId);
 				socket.on('players-update', handlePlayersUpdate);
@@ -100,7 +93,6 @@
 		return () => {
 			leaveGameSession(gameSessionId);
 			$currentGameSessionStore = null;
-			$currentGameSessionPlayersStore = null;
 
 			socket.emit('leave-game-session', gameSessionId);
 			socket.off('players-update', handlePlayersUpdate);
