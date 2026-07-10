@@ -78,7 +78,7 @@
 	function isNearBottom() {
 		if (!messagesContainer) return true;
 
-		const threshold = 250; // px
+		const threshold = 300; // px
 		const { scrollTop, scrollHeight, clientHeight } = messagesContainer;
 
 		return scrollHeight - (scrollTop + clientHeight) < threshold;
