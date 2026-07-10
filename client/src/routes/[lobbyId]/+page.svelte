@@ -125,6 +125,17 @@
 	});
 </script>
 
+<svelte:head>
+	<title>Arc Lobby - Join Room {lobbyId}</title>
+	<meta name="description" content="You've been invited to join a private game lobby on Arc Lobby! Enter code {lobbyId} to chat and play casual multiplayer games together instantly." />
+	<meta property="og:title" content="Arc Lobby - Join Room {lobbyId}" />
+	<meta property="og:description" content="You've been invited to join a private game lobby on Arc Lobby! Enter code {lobbyId} to chat and play casual multiplayer games together instantly." />
+	<meta name="twitter:title" content="Arc Lobby - Join Room {lobbyId}" />
+	<meta name="twitter:description" content="You've been invited to join a private game lobby on Arc Lobby! Enter code {lobbyId} to chat and play casual multiplayer games together instantly." />
+</svelte:head>
+
+<h1 class="sr-only">Arc Lobby - Room {lobbyId}</h1>
+
 <div class="drawer h-dvh w-screen bg-canvas text-ink transition-colors duration-200 lg:drawer-open">
 	<input id="member-drawer" type="checkbox" class="drawer-toggle" />
 

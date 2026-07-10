@@ -131,6 +131,15 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Arc Lobby | Play Casual Multiplayer Games Online with Friends</title>
+	<meta name="description" content="Gather your friends for instant, zero-friction multiplayer gaming. No accounts, no installs—just create a room, share the lobby code, and start playing right from your browser." />
+	<meta property="og:title" content="Arc Lobby | Play Casual Multiplayer Games Online with Friends" />
+	<meta property="og:description" content="Gather your friends for instant, zero-friction multiplayer gaming. No accounts, no installs—just create a room, share the lobby code, and start playing right from your browser." />
+	<meta name="twitter:title" content="Arc Lobby | Play Casual Multiplayer Games Online with Friends" />
+	<meta name="twitter:description" content="Gather your friends for instant, zero-friction multiplayer gaming. No accounts, no installs—just create a room, share the lobby code, and start playing right from your browser." />
+</svelte:head>
+
 <div
 	class="relative flex min-h-screen w-full flex-col items-center justify-start gap-12 bg-canvas px-4 py-12 text-ink transition-colors duration-200 md:gap-16"
 >

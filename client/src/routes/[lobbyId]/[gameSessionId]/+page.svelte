@@ -41,6 +41,17 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Arc Lobby - Playing {$session?.gameId ? $session.gameId.replace('-', ' ').toUpperCase() : 'Game'}</title>
+	<meta name="description" content="Join or spectate this live game session of {$session?.gameId ? $session.gameId.replace('-', ' ') : 'a multiplayer game'} on Arc Lobby!" />
+	<meta property="og:title" content="Arc Lobby - Live Game Session" />
+	<meta property="og:description" content="Join or spectate this live game session of {$session?.gameId ? $session.gameId.replace('-', ' ') : 'a multiplayer game'} on Arc Lobby!" />
+	<meta name="twitter:title" content="Arc Lobby - Live Game Session" />
+	<meta name="twitter:description" content="Join or spectate this live game session of {$session?.gameId ? $session.gameId.replace('-', ' ') : 'a multiplayer game'} on Arc Lobby!" />
+</svelte:head>
+
+<h1 class="sr-only">Arc Lobby - Live Game Session: {$session?.gameId ? $session.gameId.replace('-', ' ').toUpperCase() : 'Game'}</h1>
+
 <div class="relative flex h-dvh w-screen flex-col">
 	{#if $session?.gameId === 'simple-game'}
 		<SimpleGameUI {...data} />
