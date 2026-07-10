@@ -1,7 +1,7 @@
 ---
 version: alpha
 name: Arc-Lobby-design-analysis
-description: A playful, mascot-driven multiplayer-gaming interface built on soft rounded cards, chunky friendly typography, and a cast of blocky character illustrations (winking yellow square, flag-bearing pink block, cheerful green blob). The system ships in both a warm cream light mode and a near-black navy dark mode, with hand-drawn decorative squiggles, sparkles, and dot-clusters scattered across the canvas to keep the "no accounts, no installs" pitch feeling like a toy rather than a tool. Purple is the brand anchor color; yellow, pink, and green rotate through as accent colors on mascots, badges, and CTAs.
+description: A playful multiplayer-gaming interface built on soft rounded cards, chunky friendly typography, and expressive visual elements. The system ships in both a warm cream light mode and a near-black navy dark mode, with hand-drawn decorative squiggles, sparkles, and dot-clusters scattered across the canvas to keep the "no accounts, no installs" pitch feeling like a toy rather than a tool. Purple is the brand anchor color; yellow, pink, and green rotate through as accent colors on badges, icons, and CTAs.
 
 colors:
   primary: "#7C5CFC"
@@ -209,25 +209,19 @@ components:
     typography: "{typography.body-sm}"
     rounded: "{rounded.lg}"
     padding: 20px 32px
-  mascot-illustration:
-    backgroundColor: transparent
-    rounded: "{rounded.none}"
 ---
 
 ## Overview
 
 Arc Lobby's marketing/onboarding surface is a warm, toy-box interpretation of a gaming utility: a cream (`{colors.canvas-light}`) or near-black navy (`{colors.canvas-dark}`) canvas holding a two-panel layout — a profile customizer on the left, a host/join flow on the right — surrounded by loose, hand-scattered decoration (orange squiggles, four-point sparkles, pink dot-clusters, faint stars). Nothing sits on a strict grid; ornamentation drifts into the margins the way stickers would on a laptop lid.
 
-The product's three-legged mascot cast — a winking yellow square, a flag-planting pink block, and a wide-eyed green blob — does the emotional work a hero photograph would do in a more serious system. Each mascot appears once per major surface (profile avatar, host card, join card) and never repeats a pose, reinforcing that these are "characters," not stock icons.
-
 Structurally the page reads as **stacked rounded cards**: an outer `{component.panel-card}` holds each half of the layout, and two tinted sub-panels — `{component.host-panel}` (warm yellow tint) and `{component.join-panel}` (cool lavender tint) — nest inside the right-hand card to visually separate "create" from "join" without a heavier divider. Below the two-column layout, a horizontal `{component.step-strip}` walks the user through onboarding in three numbered, colored badges, and a final `{component.feature-strip}` closes the page with three trust icons in a single row.
 
 **Key Characteristics:**
-- Dual-mode canvas: warm cream light mode (`{colors.canvas-light}`) and near-black navy dark mode (`{colors.canvas-dark}`) — both modes keep the same layout, card tinting logic, and mascot artwork, only the base + card colors invert.
-- Generous corner radius throughout — `{rounded.lg}` (20px) to `{rounded.xl}` (28px) on cards, `{rounded.md}` (14px) on buttons and inputs, `{rounded.full}` on avatars and icon badges. Nothing in the system uses `{rounded.none}` except mascot artwork bounding boxes.
+- Dual-mode canvas: warm cream light mode (`{colors.canvas-light}`) and near-black navy dark mode (`{colors.canvas-dark}`) — both modes keep the same layout and card tinting logic, only the base + card colors invert.
+- Generous corner radius throughout — `{rounded.lg}` (20px) to `{rounded.xl}` (28px) on cards, `{rounded.md}` (14px) on buttons and inputs, `{rounded.full}` on avatars and icon badges.
 - Two accent-tinted sub-panels (yellow "Host," lavender "Join") sit inside a neutral card — color-coding the two primary actions rather than relying on copy alone.
 - Buttons swap surface color by mode: light mode uses near-black `{component.button-primary-dark}` buttons for both primary actions; dark mode swaps in bright `{component.button-accent-yellow}` (Create) and `{component.button-accent-purple}` (Join) so buttons stay legible and energetic against the dark canvas.
-- Illustration-first empty states — every card carries a mascot rendered at a consistent ~120–140px scale in its bottom-right corner.
 - Loose, non-grid-aligned decoration (squiggles, sparkles, dot pairs) scattered at canvas edges — always outside card boundaries, never overlapping content.
 - Numbered onboarding steps use a rotating three-color badge sequence (purple → yellow → pink) rather than a single repeated brand color.
 
@@ -237,8 +231,8 @@ Structurally the page reads as **stacked rounded cards**: an outer `{component.p
 - **Primary Purple** (`{colors.primary}` — #7C5CFC): The wordmark accent ("Lobby"), avatar edit badge, icon badges, and the dark-mode "Join Lobby" button. The system's single most consistent brand color across both modes.
 - **Primary Purple (Dark Mode)** (`{colors.primary-dark-mode}` — #8B70FF): A slightly brighter lift of the primary purple used specifically on dark-mode button fills, where the deeper shade would lose contrast against navy.
 - **Accent Yellow** (`{colors.accent-yellow}` — #F6C445): Powers the "Host a New Room" panel tint and the dark-mode "Create Lobby" button. Reads as energetic/inviting — the "start something new" color.
-- **Accent Pink** (`{colors.accent-pink}` — #FF5D8F): Used on the flag-bearing mascot, decorative sparkle marks, and the step-3 numbered badge.
-- **Accent Green** (`{colors.accent-green}` — #57D08C): The green blob mascot and the "Safe & Private" shield icon.
+- **Accent Pink** (`{colors.accent-pink}` — #FF5D8F): Used on decorative sparkle marks and the step-3 numbered badge.
+- **Accent Green** (`{colors.accent-green}` — #57D08C): The "Safe & Private" shield icon.
 - **Accent Orange** (`{colors.accent-orange}` — #FF8A3D): Reserved almost entirely for decorative squiggle lines — never used on interactive elements.
 - **Accent Mint** (`{colors.accent-mint}` — #3FBFA3): Occasional secondary sparkle/dot color, used at low frequency for variety.
 
@@ -323,7 +317,7 @@ Whitespace in Arc Lobby is never fully "empty" — it's decoration space. Margin
 | Card surface | `{colors.card-light}` / `{colors.card-dark}` background, soft ambient shadow, no border | `{component.panel-card}`, `{component.step-strip}`, `{component.feature-strip}` |
 | Floating badge | Solid color fill, `{rounded.full}`, subtle shadow | `{component.edit-badge}`, `{component.icon-badge-circle}`, `{component.step-number-badge}` |
 
-Depth is soft and diffuse rather than sharp — cards lift off the canvas with a light, low-contrast shadow (never a hard drop shadow), consistent with the toy/paper-cutout aesthetic. Mascot illustrations carry their own implied depth through simple cel-shading, not through UI chrome.
+Depth is soft and diffuse rather than sharp — cards lift off the canvas with a light, low-contrast shadow (never a hard drop shadow), consistent with the toy/paper-cutout aesthetic.
 
 ## Shapes
 
@@ -331,17 +325,14 @@ Depth is soft and diffuse rather than sharp — cards lift off the canvas with a
 
 | Token | Value | Use |
 |---|---|---|
-| `{rounded.none}` | 0px | Mascot illustration bounding boxes only |
+| `{rounded.none}` | 0px | Unused (retained for future layout elements) |
 | `{rounded.sm}` | 8px | Rare — small inline chips |
 | `{rounded.md}` | 14px | Buttons, text inputs |
 | `{rounded.lg}` | 20px | Host/join sub-panels, step-strip and feature-strip cards |
 | `{rounded.xl}` | 28px | Outer panel cards ("Customize Profile," "Host or Join Lobby") |
 | `{rounded.full}` | 9999px | Avatar frame, edit badge, icon badges, step-number badges |
 
-The radius hierarchy scales *up* with container size — the bigger the surface, the rounder its corners — which is the inverse of the sharp-edged, "bigger surface = sharper corner" convention seen in more technical systems. This consistently soft geometry, plus fully circular badges and avatars, is what gives Arc Lobby its toy/mascot personality.
-
-### Illustration Geometry
-Mascot characters are simple, blocky, rounded-corner shapes (the yellow character reads as a rounded square with limbs; the pink character as a rounded rectangle) rendered in a flat, cel-shaded illustration style with thick outlines and small white sparkle highlights. Characters always face slightly outward or wave toward the card's content rather than standing neutrally, giving each card a sense of address.
+The radius hierarchy scales *up* with container size — the bigger the surface, the rounder its corners — which is the inverse of the sharp-edged, "bigger surface = sharper corner" convention seen in more technical systems. This consistently soft geometry, plus fully circular badges and avatars, is what gives Arc Lobby its toy-like personality.
 
 ## Components
 
@@ -361,9 +352,9 @@ Mascot characters are simple, blocky, rounded-corner shapes (the yellow characte
 
 **`panel-card`** — The two large outer cards that structure the page ("Customize Profile" and "Host or Join Lobby"). Background `{colors.card-light}`/`{colors.card-dark}`, rounded `{rounded.xl}` (28px), padding `{spacing.xl}` (32px), soft ambient shadow. Each opens with an `{component.icon-badge-circle}` + `{typography.card-title}` header row.
 
-**`host-panel`** — Nested sub-panel for "Host a New Room." Background `{colors.host-panel-light}`/`{colors.host-panel-dark}` with a matching-hue border, rounded `{rounded.lg}` (20px), padding `{spacing.lg}` (24px). Holds a `{typography.section-title}`, one line of `{typography.body-md}` description, a `{component.button-primary-dark}`/`{component.button-accent-yellow}`, and the flag-bearing pink mascot in the bottom-right corner.
+**`host-panel`** — Nested sub-panel for "Host a New Room." Background `{colors.host-panel-light}`/`{colors.host-panel-dark}` with a matching-hue border, rounded `{rounded.lg}` (20px), padding `{spacing.lg}` (24px). Holds a `{typography.section-title}`, one line of `{typography.body-md}` description, and a `{component.button-primary-dark}`/`{component.button-accent-yellow}`.
 
-**`join-panel`** — Nested sub-panel for "Join with Room Code." Background `{colors.join-panel-light}`/`{colors.join-panel-dark}` with a matching-hue border, same radius and padding as `{component.host-panel}`. Holds a title, description, a `{component.text-input}` for the 6-character code paired inline with a `{component.button-primary-dark}`/`{component.button-accent-purple}`, and the green blob mascot in the corner.
+**`join-panel`** — Nested sub-panel for "Join with Room Code." Background `{colors.join-panel-light}`/`{colors.join-panel-dark}` with a matching-hue border, same radius and padding as `{component.host-panel}`. Holds a title, description, and a `{component.text-input}` for the 6-character code paired inline with a `{component.button-primary-dark}`/`{component.button-accent-purple}`.
 
 **`step-strip`** — The "How to Play in 3 Steps" row. Three equal cells, each a `{component.step-number-badge}` (rotating purple/yellow/pink fill) beside a small icon, a bold one-line title (e.g., "SET PROFILE"), and a `{typography.body-sm}` description underneath. Cells sit inside a single rounded container or as three independent cards depending on viewport.
 
@@ -373,7 +364,7 @@ Mascot characters are simple, blocky, rounded-corner shapes (the yellow characte
 
 **`text-input`** — Standard field used for both "Display Name" and "Enter 6-character code." Background `{colors.card-light}`/`{colors.card-dark}`, rounded `{rounded.md}` (14px), height 48px, padding 12px × 16px, 1px hairline border. A trailing pencil-icon affordance appears inside display-oriented inputs (like Display Name) to signal inline editability.
 
-**`avatar-frame`** — Large circular profile-photo frame (~160px), background `{colors.canvas-light}`/`{colors.canvas-dark}`, holding the user's chosen mascot centered inside. A small `{component.edit-badge}` (purple circle with pencil icon, ~36px) overlaps the bottom-right edge of the frame.
+**`avatar-frame`** — Large circular profile-photo frame (~160px), background `{colors.canvas-light}`/`{colors.canvas-dark}`, holding the user's chosen emoji/icon centered inside. A small `{component.edit-badge}` (purple circle with pencil icon, ~36px) overlaps the bottom-right edge of the frame.
 
 ### Signature Components
 
@@ -391,16 +382,13 @@ Mascot characters are simple, blocky, rounded-corner shapes (the yellow characte
 - Pair a bouncy display wordmark (`{typography.wordmark}`) with clean, restrained UI type (`{typography.card-title}` and below) everywhere else — the logo carries the personality; the interface stays legible.
 - Color-code parallel actions through panel tint (yellow = host/create, lavender = join) rather than only through button color or copy.
 - Swap button fill by mode (`{component.button-primary-dark}` in light mode → `{component.button-accent-yellow}` / `{component.button-accent-purple}` in dark mode) to preserve contrast against the canvas.
-- Give every major card a mascot in its bottom-right corner — the illustration is the card's emotional anchor.
 - Keep border radius scaling *up* with container size: buttons and inputs at `{rounded.md}`, sub-panels at `{rounded.lg}`, outer cards at `{rounded.xl}`.
 - Scatter decorative squiggles/sparkles/dots only in the margins outside cards — never let ornamentation cross into content areas.
 
 ### Don't
 - Don't set button or card-title text in uppercase with heavy tracking — the system's voice is sentence-case and conversational, not "machined."
-- Don't use a hard, high-contrast drop shadow. Card elevation stays soft and diffuse to match the paper-cutout illustration style.
-- Don't reuse the same mascot pose across two different cards — each character/pose should feel unique to its moment.
+- Don't use a hard, high-contrast drop shadow. Card elevation stays soft and diffuse to match the paper-cutout style.
 - Don't introduce a fourth panel-tint hue beyond the established yellow (host) / lavender (join) pairing without a clear new action to differentiate.
-- Don't apply `{rounded.none}` to any UI chrome — it's reserved exclusively for mascot artwork bounding boxes.
 - Don't let decorative elements (squiggles, sparkles, dots) sit at a density that competes with card content — they stay low-frequency and peripheral.
 
 ## Responsive Behavior
@@ -423,29 +411,26 @@ Mascot characters are simple, blocky, rounded-corner shapes (the yellow characte
 - The two-column desktop layout collapses to a single stacked column on mobile, with "Customize Profile" first and "Host or Join Lobby" second — matching the natural top-to-bottom reading order shown in the mobile screenshots.
 - The nested host/join sub-panels always stay stacked vertically (never side-by-side), even on wide desktop, preserving the "OR" divider's meaning.
 - Step-strip and feature-strip rows reduce from 3-up to 1-up stacked cards on mobile, each retaining its full icon + title + description.
-- Mascot illustrations shrink proportionally with their parent card rather than being cropped or hidden at small viewports.
 
-### Image/Illustration Behavior
-- Mascot artwork scales down proportionally at narrow viewports but is never removed — the characters are core to brand recognition even on mobile.
+### Image/Icon Behavior
 - Decorative squiggles, sparkles, and dot clusters reduce in count (not just size) on mobile to avoid visual noise against the narrower canvas.
 - The avatar frame stays circular and centered at every breakpoint, resizing from ~160px desktop down to a smaller mobile-appropriate size while keeping the edit badge proportionally anchored to its bottom-right edge.
 
 ## Iteration Guide
 
 1. Focus on ONE component at a time. Reference its YAML key (`{component.host-panel}`, `{component.step-number-badge}`).
-2. New sub-panels default to `{rounded.lg}` (20px); new outer cards default to `{rounded.xl}` (28px). Only use `{rounded.none}` for illustration bounding boxes.
+2. New sub-panels default to `{rounded.lg}` (20px); new outer cards default to `{rounded.xl}` (28px).
 3. When adding a new primary action, decide its light-mode fill (`{component.button-primary-dark}`) and its dark-mode accent swap before shipping — the two modes are never just an inverted-color pass.
 4. Use `{token.refs}` everywhere — never inline hex.
-5. Never document hover states beyond Default and Pressed — the mascot illustrations already carry the system's "delight" budget.
+5. Never document hover states beyond Default and Pressed — the clean micro-interactions carry the system's "delight" budget.
 6. Keep the display/UI type-weight split intact: wordmark stays in `{typography.wordmark}`, everything else stays in the Plus Jakarta Sans / Inter family.
 7. New accent-tinted panels should pick a color from the established palette (purple, yellow, pink, green) rather than introducing a new hue.
-8. When in doubt about emphasis: a mascot pose or a numbered badge color change communicates more warmth than a new shadow or gradient would.
+8. When in doubt about emphasis: a badge color change communicates more warmth than a new shadow or gradient would.
 
 ## Known Gaps
 
-- Exact hex values for the mascot fill colors (yellow, pink, green) are estimated from the screenshots at typical screen-compression fidelity; a vector source file would give more precise stops.
 - The specific rounded display typeface is inferred visually (Baloo 2 / Fredoka family) — no font-loading metadata was available to confirm the exact licensed family in use.
 - Hover, focus-ring, and error/validation states for `{component.text-input}` (e.g., an invalid room code) are not shown in the captured screens and are not documented here.
 - Only the onboarding/lobby-creation screen was provided; in-game or active-lobby screens (once a room is live) are out of scope for this analysis.
 - The "OR" divider's exact rule styling (dash pattern, weight) is approximated from the screenshot; a live inspection would confirm exact stroke values.
-- Motion/transition behavior (e.g., how the mascots animate on hover or on successful lobby creation) is not captured in static screenshots and is not documented here.
+- Motion/transition behavior (e.g., how interactive elements animate on hover or on successful lobby creation) is not captured in static screenshots and is not documented here.
