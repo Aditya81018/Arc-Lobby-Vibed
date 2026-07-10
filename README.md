@@ -164,3 +164,14 @@ Update the dynamic renderer switch inside [`client/src/routes/[lobbyId]/[gameSes
 	{/if}
 </div>
 ```
+
+---
+
+## 📄 License & Trademarks
+
+This project's source code is licensed under the [GNU Affero General Public License v3.0](./LICENSE).
+
+### Branding & Logo Trademark
+
+The name "Arc Lobby", the logo designs, and other brand assets are trademarks (or intended trademarks) of this project and are **not** covered by the open-source license. Please consult [TRADEMARKS.md](./TRADEMARKS.md) for details on permitted and restricted uses of our brand assets.
+
